@@ -1,0 +1,105 @@
+﻿@*******************************************************************************************************
+//  BusinessUnits.cshtml - Gbtc
+//
+//  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
+//
+//  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
+//  the NOTICE file distributed with this work for additional information regarding copyright ownership.
+//  The GPA licenses this file to you under the MIT License (MIT), the "License"; you may not use this
+//  file except in compliance with the License. You may obtain a copy of the License at:
+//
+//      http://opensource.org/licenses/MIT
+//
+//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+//  License for the specific language governing permissions and limitations.
+//
+//  Code Modification History:
+//  ----------------------------------------------------------------------------------------------------
+//  02/29/2016 - Ritchie Carroll
+//       Generated original version of source code.
+//
+//*****************************************************************************************************@
+@using GSF.Web.Model
+@using MiPlan.Models
+@model AppModel
+@{
+    DataContext dataContext = Model.DataContext;
+
+    // Define column headers, use null for field name to make column non-sortable
+    ViewBag.HeaderColumns = new[]
+    {   //    { "Field", "Label", "Classes" }
+        new[] { "Name", "Name", "text-center" },
+        new[] { null, "Coordinator", "text-center" },
+        new[] { "Description", "Description", "text-left" },
+    };
+
+    ViewBag.BodyRows = BodyRows().ToString();
+    ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
+}
+@helper BodyRows()
+{
+    <td width="25%" class="text-center valign-middle" nowrap><button type="button" class="btn btn-link" data-bind="text: Name, click: $parent.viewPageRecord"></button></td>
+    <td width="30%" class="text-center valign-middle" nowrap><button type="button" class="btn btn-link" data-bind="text: AccountName(), attr: {title: CoordinatorID}, click: $parent.viewPageRecord"></button></td>
+    <td width="40%" class="text-left table-cell-hard-wrap"><div data-bind="text: $($element.parentElement).truncateToWidth(Description, 2), attr: {title: Description}"></div></td>
+    <td width="5%" class="text-center valign-middle" nowrap>
+        <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
+        <button type="button" class="btn btn-xs" data-bind="click: $parent.removePageRecord, enable: $parent.canDelete() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-remove"></span></button>
+    </td>
+}
+@helper AddNewEditDialog(DataContext dataContext)
+{
+    <div class="col-md-12">
+        @Html.Raw(dataContext.AddInputField<BusinessUnit>("Name", initialFocus: true))
+        @Html.Raw(dataContext.AddInputField<BusinessUnit>("Abbreviation"))
+        @Html.Raw(dataContext.AddSelectField<BusinessUnit, UserAccount>("CoordinatorID", "ID", "Name", optionDataBinding: "text: lookupOptionLabel($($element))"))
+        @Html.Raw(dataContext.AddSelectField<BusinessUnit, UserAccount>("BackupCoordinatorID", "ID", "Name", optionDataBinding: "text: lookupOptionLabel($($element))"))
+        @Html.Raw(dataContext.AddTextAreaField<BusinessUnit>("Description"))
+    </div>
+}
+@Html.Partial("PagedViewModel")
+@section Scripts {
+    <script>
+        "use strict";
+
+        @Html.Raw(Model.RenderViewModelConfiguration<BusinessUnit>(ViewBag))
+        // Resolve option label SID to an account name
+        function lookupOptionLabel(element) {
+            if (viewModel.dataHubIsConnected()) {
+                securityHub.sidToAccountName(element.text()).done(function (accountName) {
+                    element.text(accountName);
+                });
+            }
+
+            return element.text();
+        }
+
+        function lookupAccountName(record) {
+            if (viewModel.dataHubIsConnected()) {
+                securityHub.queryUserAccount(record.CoordinatorID).done(function (userAccount) {
+                    securityHub.sidToAccountName(userAccount.Name).done(function (accountName) {
+                        record.AccountName(accountName);
+                    });
+                });
+            }
+        }
+
+        $(viewModel).on("pageRecordsQueried", function (event, records) {
+            // Add a virtual observable field called "AccountName" that will resolve SID values to account names
+            for (var i = 0; i < records.length; i++) {
+                records[i].AccountName = ko.observable(records[i].CoordinatorID);
+                lookupAccountName(records[i]);
+            }
+        });
+
+        $(viewModel).on("newRecord", function (event, newRecord) {
+            // Make sure new records get virtual field
+            newRecord.AccountName = ko.observable("");
+        });
+
+        $(viewModel).on("derivingJSRecord", function (event, observableRecord) {
+            // Remove virtual observable field before serialization for record updates
+            delete observableRecord.AccountName;
+        });
+    </script>
+}
