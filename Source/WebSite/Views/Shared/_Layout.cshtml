@@ -179,8 +179,9 @@
                     }
                 </ul>
                 <footer id="footer">
-                    @if (showCopyright) {
-                        <p class="small"><a href="@Url.Content(copyrightUrl)">@copyrightText</a></p>
+                    @if (showCopyright)
+                    {
+                      <p><a class="custom-text" href="@Url.Content(copyrightUrl)">@copyrightText</a></p>
                     }
                 </footer>
             </div>
