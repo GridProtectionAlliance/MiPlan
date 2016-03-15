@@ -22,88 +22,102 @@
 //*****************************************************************************************************@
 @using MiPlan.Models
 @model AppModel
+@section StyleSheets{
+    <style>
+        img.image-wrap {
+            float: left;
+            margin: 0 15px 5px 0;
+            vertical-align: central;
+        }
 
+        p.image-wrap {
+            text-align: justify;
+        }
+
+        ul.image-wrap {
+            list-style-position: inside;
+        }
+
+    </style>
+}
 <table class="table table-striped">
 
     <colgroup>
-        <col class="col-md-2">
-        <col class="col-md-1">
-        <col class="col-md-9">
+        <col class="col-md-12">
     </colgroup>
 
     <tbody>
         <tr>
-            <td >Step</td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>Description</td>
+            <td>Step&nbsp;&nbsp;&nbsp;Description</td>
         </tr>
-        <tr valign="middle">
-            <td ><img src="~/Images/ProcessSteps/Small/1settings.png" /></td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
+        <tr>
             <td>
-                <p>By clicking on "settings" in the main menu, those with authorization can update the following lists:</p>
-                <ol>
-                  
-                    <li>
-                        The <b>Business Unit</b> List -  Business units represent the logical grouping of editors into an approval authority or plan "owner" (BU Coordinator).
-                        Both a primary and alternate Business Unit approval authority can be designated for each BU.
-                        System Adminsistrators can create as many business units as necessary to manage the BU Coordinator to editor accountability relationships. 
-                    </li>
-
-                    <li>
-                        The <b>Plan BU Editors</b> - Users that have the "editor" role are further restricted to editing the plans wihtin their BU.  Currently editors can only belong to one BU.
-                    </li>
-                   
-                </ol>
-            </td>
-        </tr>
-
-        <tr valign="middle">
-            <td ><img src="~/Images/ProcessSteps/Small/2addPlan.png" /></td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>
-                <p>Editors can use "Add Plan" menu item to add plans manually.  These plans will not be linked to the openSPM application - but can be used to track and manage other activities.</p>
-                
-                <p>Plans that have been created automatically by openSPM can be viewed by clicking on the "openPlans" menu item.   New plans have a status "Pending".   (Other plan states are Started, Completed, Suspended and Closed.  
-                Plans that are not closed are listed on the "open plans" list.)</p>
-            </td>
-        </tr>
-
-        <tr valign="middle">
-            <td ><img src="~/Images/ProcessSteps/Small/3startTracking.png" /></td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>
-                <p>From the "Open Plans" list, clicking on the start tracking button:</p>
-                <ol>
-                    <li>Checks that a plan has at least one action. </li>
-                    <li>Sends an email to the plan owner (the BU Coordinator) that a plan is available for approval.</li>
-                </ol>
-
-
-            </td>
-        </tr>
-
-        <tr valign="middle">
-            <td v><img src="~/Images/ProcessSteps/Small/4updateActions.png" /></td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
-            <td>
-                <p>Editors have the ability to edit plans within their BU from the "Open Plans" list.  Any change to a substitive item (addition or removal of an action item, change of of action item description, or change in action item schedule start or stop date) requires the plan to be re-approved by
-                the plan owner (BU Coordinator).  Status fields (actual start dates, completion dates, updates to plan prose) can be updated by plan editors without the need for approval of these changes.</p>
-
+                <img src="~/Images/ProcessSteps/Small/1settings.png" class="image-wrap"/>
+                <p class="image-wrap">
+                    <div>
+                        By clicking on "settings" in the main menu, those with authorization can update the following lists:
+                    </div>
+                    <ul class="image-wrap">
+                        <li>
+                            The <b>Business Unit</b> List - Business units represent the logical grouping of editors into an approval authority or plan "owner" (BU Coordinator).
+                            Both a primary and alternate Business Unit approval authority can be designated for each BU.
+                            System Administrators can create as many business units as necessary to manage the BU Coordinator to editor accountability relationships.
+                        </li>
+                        <li>
+                            The <b>Plan BU Editors</b> - Users that have the "editor" role are further restricted to editing the plans within their BU. Currently editors can only belong to one BU.
+                        </li>
+                    </ul>
+                </p>
             </td>
         </tr>
 
         <tr>
-            <td ><img src="~/Images/ProcessSteps/Small/5closePlan.png" /></td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
             <td>
-                <p>After the last action item has been completed, the plan status changes to "Completed".  The plan status must be changed to "Closed" by the Owner for the plan to be removed from the open plan list.</p>
+                <img src="~/Images/ProcessSteps/Small/2addPlan.png" class="image-wrap" />
+                <p class="image-wrap">
+                    <div>Editors can use "Add Plan" menu item to add plans manually. These plans will not be linked to the openSPM application - but can be used to track and manage other activities.</div>
+
+                    <div>
+                        Plans that have been created automatically by openSPM can be viewed by clicking on the "openPlans" menu item. New plans have a status "Pending". (Other plan states are Started, Completed, Suspended and Closed.
+                        Plans that are not closed are listed on the "open plans" list.)
+                    </div>
+                </p>
             </td>
         </tr>
 
         <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
+            <td>
+                <img src="~/Images/ProcessSteps/Small/3startTracking.png" class="image-wrap" />
+                <p class="image-wrap">
+                    <div>From the "Open Plans" list, clicking on the start tracking button:</div>
+                    <ul class="image-wrap">
+                        <li>Checks that a plan has at least one action. </li>
+                        <li>Sends an email to the plan owner (the BU Coordinator) that a plan is available for approval.</li>
+                    </ul>
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <img src="~/Images/ProcessSteps/Small/4updateActions.png" class="image-wrap" />
+                <p class="image-wrap">
+                    Editors have the ability to edit plans within their BU from the "Open Plans" list. Any change to a substantive item (addition or removal of an action item, change of action item description, or change in action item schedule start or stop date) requires the plan to be re-approved by
+                    the plan owner (BU Coordinator). Status fields (actual start dates, completion dates, updates to plan prose) can be updated by plan editors without the need for approval of these changes.
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <img src="~/Images/ProcessSteps/Small/5closePlan.png" class="image-wrap" />
+                <p class="image-wrap">
+                    After the last action item has been completed, the plan status changes to "Completed". The plan status must be changed to "Closed" by the Owner for the plan to be removed from the open plan list.
+                </p>
+            </td>
+        </tr>
+
+        <tr>
             <td>
                 <p><a id="Definitions"></a>Definitions:</p>
                 <p><b>Business Unit</b> (BU) - An virtual organizational entity comprised that has a coordinator (the approval authority) and SMEs (the technical experts) that have responsibility for CCA.</p>
@@ -114,8 +128,6 @@
         </tr>
       
         <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;&nbsp;&nbsp;</td>
             <td>
                 <p><a id="Roles"></a>User Roles:</p>       
                 <p><b>System Administrator</b> (Admin) - Information Technology personnel authorized to establish users and roles and set implementation specific configuration parameters (e.g., data base location).  Admins have unrestricted access to all pages in the MiPlan System.</p>
@@ -126,7 +138,7 @@
 
         </tr>
         <tr style="height: 150px; border: none">
-            <td colspan="2">&nbsp;</td>
+            <td>&nbsp;</td>
         </tr>
     </tbody>
 </table>
