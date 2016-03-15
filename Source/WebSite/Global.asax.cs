@@ -61,10 +61,6 @@ namespace MiPlan
 
         protected void Application_Start()
         {
-            // TODO: Verify this is necessary
-            SecurityHub hubInstance = new SecurityHub();
-
-
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
