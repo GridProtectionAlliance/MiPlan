@@ -1,5 +1,5 @@
 //******************************************************************************************************
-//  ActionItem.cs - Gbtc
+//  Plan.cs - Gbtc
 //
 //  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
 //
@@ -29,42 +29,49 @@ using GSF.Data.Model;
 namespace MiPlan.Models
 {
     /// <summary>
-    /// Model for MiPlan.ActionItem table.
+    /// Model for MiPlan.Plan table.
     /// </summary>
-    [PrimaryLabel("Title")]
-    public class ActionItem
+    [PrimaryLabel("Summary")]
+    [IsDeletedFlag("IsDeleted")]
+    public class MitigationPlan
     {
         [PrimaryKey(true)]
         public int ID { get; set; }
 
-        [Label("Parent Action Item")]
-        public int? ParentID { get; set; }
-
-        public int PlanID { get; set; }
-
-        [Label("Action Type")]
-        public int? ActionTypeKey { get; set; }
-
-        [Label("Priority")]
-        public int? PriorityKey { get; set; }
-
+        [Required]
+        [Label("Patch")]
         [StringLength(80)]
         public string Title { get; set; }
 
-        public string Details { get; set; }
+        [Required]
+        public int ThemeID { get; set; }
 
-        [Label("Scheduled Start Date")]
-        [Column(TypeName = "date")]
-        [InitialValue("new Date()")]
-        public DateTime? ScheduledStartDate { get; set; }
+        [Required]
+        public int BusinessUnitID { get; set; }
 
-        [Label("Scheduled End Date")]
-        [Column(TypeName = "date")]
-        [InitialValue("new Date()")]
-        public DateTime? ScheduledEndDate { get; set; }
+        public int ForeignKey1 { get; set; }
 
-        [InitialValue("1")]
-        public bool Enabled { get; set; }
+        public int ForeignKey2 { get; set; }
+
+        public int ForeignKey3 { get; set; }
+
+        [Required]
+        public bool IsDeleted { get; set; }
+
+        public string Field1 { get; set; }
+
+        public string Field2 { get; set; }
+
+        public string Field3 { get; set; }
+        public string Field4 { get; set; }
+        public string Field5 { get; set; }
+        public string Field6 { get; set; }
+        public string Field7 { get; set; }
+        public string Field8 { get; set; }
+        public string Field9 { get; set; }
+        public string Description { get; set; }
+
+        public string StatusNotes { get; set; }
 
         public DateTime CreatedOn { get; set; }
 

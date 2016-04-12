@@ -92,25 +92,27 @@
     ViewBag.HeaderColumns = new[]
 {
         //    { "Field", "Label", "Classes" }
-        new[] { null, "Status", "text-center"},
-        new[] { "PatchID", "SPM Reference", "text-left" },
+        new[] { null, "Status", "text-center valign-middle"},
+        new[] { "Title", "SPM Reference", "text-left" },
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
-        new[] { "Title", "Title", "text-left"},
-    
+        new[] { "Field1", "Title", "text-left"},
+        new[] { null, "Actions", "text-center valign-middle" }
+
     };
 
     ViewBag.BodyRows = BodyRows().ToString();
     ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
-    ViewBag.AddNewEditTitle = "Plan";
+    ViewBag.AddNewEditTitle = "MitigationPlan";
+
 }
 @helper BodyRows()
 {
 
-
-    <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: lookupPatchMnemonicValue(PatchID), click: $parent.viewPageRecord"></button></td>
-    <td width="30%" class="text-left valign-middle"><div nowrap data-bind="text: PatchID"></div></td>
-    <td width="30%" class="text-left valign-middle"><div nowrap data-bind="text: BusinessUnitID"></div></td>
-    <td width="10%" class="text-left valign-middle"><div nowrap data-bind="text: Title"></div></td>
+    <td width="5%" class="text-left valign-middle"></td>
+    <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
+    <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
+    <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
+    <td width="10%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
     <td width="5%" class="text-center valign-middle" nowrap>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.removePageRecord, enable: $parent.canDelete() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-remove"></span></button>
@@ -121,13 +123,84 @@
 {
 
     <div class="col-md-12">
-        @Html.Raw(dataContext.AddTextAreaField<Plan>("Detail"))
-        @Html.Raw(dataContext.AddTextAreaField<Plan>("CompletedNotes"))
+
+        @Html.Raw(dataContext.AddInputField<MitigationPlan>("Title"))
+        @Html.Raw(dataContext.AddSelectField<MitigationPlan, BusinessUnit>("BusinessUnitID", "ID", "Name"))
+        @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
+        {
+
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+        }
+        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
+        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
     </div>
 }
 @Html.Partial("PagedViewModel")
+
+<div id="editActionItemDialog" class="modal modal-wide fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <iframe style="border: none" id="editActionItemFrame"></iframe>
+                <button type="button" class="btn btn-default pull-right popup-ok-button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        @Html.Raw(Model.RenderViewModelConfiguration<Plan>(ViewBag))
+        @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlan>(ViewBag))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+
+        function getActionItemCount(pageID, element) {
+            console.log(PageID);
+            if (viewModel.dataHubIsConnected()) {
+                dataHub.queryActionItemCount(pageID).done(function (count) {
+                    const actionItemMode = $("#actionItemMode" + pageID);
+                    const actionItemCount = $("#actionItemCount" + pageID);
+                    const modeText = count > 0 ? "Edit" : "Add";
+
+                    if (actionItemMode.text() !== modeText)
+                        actionItemMode.text(modeText);
+
+                    if (actionItemCount.text() !== count.toString())
+                        actionItemCount.text(count.toString());
+                });
+            }
+
+            return element.text();
+        }
+
+        $(window).resize(function () {
+            setTimeout(function () {
+                $("#editMenuItemFrame").attr("height", ($(document).height() - 150) + "px");
+            }, 500);
+
+        });
+
+        function openMenuItemEditor(record) {
+            //console.log(record);
+            $("#editActionItemFrame").attr({
+                "src": "@Url.Content("~/Main/ActionItem")?PlanID=" + record.ID + "&Title=" + encodeURIComponent(record.Title),
+                "height": ($(document).height() - 150) + "px",
+                "width": "100%"
+        });
+
+        $("#editActionItemDialog").modal("show");
+        }
+
+        $("#editActionItemDialog").on("hidden.bs.modal", function () {
+            // Refresh page counts after editing tasks
+            viewModel.queryPageRecords();
+
+            // Clear frame page
+            $("#editActionItemFrame").attr("src", "about:blank");
+        });
+
+        $(function() {
+            $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
+        });
     </script>
 }

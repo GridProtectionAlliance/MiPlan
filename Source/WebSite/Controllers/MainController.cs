@@ -21,7 +21,11 @@
 //
 //******************************************************************************************************
 
+using System.Data;
+using System.Linq;
 using System.Web.Mvc;
+using System.Web.WebPages;
+using GSF.Data.Model;
 using GSF.Web.Model;
 using GSF.Web.Security;
 using MiPlan.Models;
@@ -148,9 +152,12 @@ namespace MiPlan.Controllers
             return View();
         }
 
-        public ActionResult Plan()
+        public ActionResult MitigationPlan()
         {
-            m_appModel.ConfigureView(Url.RequestContext, "Plan", ViewBag);
+            m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords( "FieldName", new RecordRestriction("ThemeID = {0}", 12)).ToArray();
+            ViewBag.ThemeFields = fields;
+            ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = 12"));
             return View();
         }
 
@@ -165,6 +172,12 @@ namespace MiPlan.Controllers
         public ActionResult Done()
         {
             m_appModel.ConfigureView(Url.RequestContext, "Done", ViewBag);
+            return View();
+        }
+
+        public ActionResult ActionItem()
+        {
+            m_appModel.ConfigureView<ActionItem>(Url.RequestContext, "ActionItem", ViewBag);
             return View();
         }
 

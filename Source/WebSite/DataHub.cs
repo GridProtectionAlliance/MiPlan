@@ -197,6 +197,116 @@ namespace MiPlan
 
         #endregion
 
+        #region [ MitigationPlan Table Operations ]
+
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecordCount)]
+        public int QueryMitigationPlanCount(bool showDeleted)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlan>().QueryRecordCount();
+
+            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
+        }
+
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecords)]
+        public IEnumerable<MitigationPlan> QueryMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
+
+            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.DeleteRecord)]
+        public void DeleteMitigationPlan(int id)
+        {
+            // For MitigationPlanes, we only "mark" a record as deleted
+            m_dataContext.Connection.ExecuteNonQuery("UPDATE MitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
+        }
+
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.CreateNewRecord)]
+        public MitigationPlan NewMitigationPlan()
+        {
+            return new MitigationPlan();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.AddNewRecord)]
+        public void AddNewMitigationPlan(MitigationPlan record)
+        {
+            record.CreatedByID = GetCurrentUserID();
+            record.CreatedOn = DateTime.UtcNow;
+            record.UpdatedByID = record.CreatedByID;
+            record.UpdatedOn = record.CreatedOn;
+            m_dataContext.Table<MitigationPlan>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
+        public void UpdateMitigationPlan(MitigationPlan record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
+        }
+
+        #endregion
+
+        #region [ ActionItem Table Operations ]
+
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ActionItem), RecordOperation.QueryRecordCount)]
+        public int QueryActionItemCount(int parentID)
+        {
+            return m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("PlanID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ActionItem), RecordOperation.QueryRecords)]
+        public IEnumerable<ActionItem> QueryActionItems(int parentID, string sortField, bool ascending, int page, int pageSize)
+        {
+            return m_dataContext.Table<ActionItem>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("PlanID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ActionItem), RecordOperation.DeleteRecord)]
+        public void DeleteActionItem(int id)
+        {
+            m_dataContext.Table<ActionItem>().DeleteRecord(id);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ActionItem), RecordOperation.CreateNewRecord)]
+        public ActionItem NewActionItem()
+        {
+            return new ActionItem();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ActionItem), RecordOperation.AddNewRecord)]
+        public void AddNewActionItem(ActionItem record)
+        {
+            record.CreatedOn = DateTime.UtcNow;
+            record.CreatedByID = GetCurrentUserID();
+            record.UpdatedOn = record.CreatedOn;
+            record.UpdatedByID = record.CreatedByID;
+            m_dataContext.Table<ActionItem>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ActionItem), RecordOperation.UpdateRecord)]
+        public void UpdateActionItem(ActionItem record)
+        {
+            record.UpdatedOn = DateTime.UtcNow;
+            record.UpdatedByID = GetCurrentUserID();
+        
+            m_dataContext.Table<ActionItem>().UpdateRecord(record);
+        }
+
+        #endregion
+
         #region [ Vendor Table Operations ]
 
         [RecordOperation(typeof(Vendor), RecordOperation.QueryRecordCount)]
@@ -350,7 +460,7 @@ namespace MiPlan
             record.CreatedByID = GetCurrentUserID();
             record.CreatedOn = DateTime.UtcNow;
             record.UpdatedByID = record.CreatedByID;
-            record.UpdatedOn = record.CreatedOn;
+            record.UpdatedOn = DateTime.UtcNow;
             m_dataContext.Table<BusinessUnit>().AddNewRecord(record);
         }
 
@@ -605,6 +715,34 @@ namespace MiPlan
         {
             m_dataContext.Table<ValueList>().UpdateRecord(record);
         }
+
+        #endregion
+
+        #region [ ThemeFields Table Operations ]
+
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecordCount)]
+        public int QueryThemeFieldsCount(int parentID)
+        {
+            return m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("GroupID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecords)]
+        public IEnumerable<ThemeFields> QueryThemeFieldsItems(int parentID, string sortField, bool ascending, int page, int pageSize)
+        {
+            return m_dataContext.Table<ThemeFields>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("GroupID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.DeleteRecord)]
+        public void DeleteThemeFields(int id)
+        {
+            m_dataContext.Table<ThemeFields>().DeleteRecord(id);
+        }
+
+     
 
         #endregion
 

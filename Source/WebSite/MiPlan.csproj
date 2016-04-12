@@ -209,6 +209,7 @@
     <Compile Include="Models\Install.cs" />
     <Compile Include="Models\InstallDocLink.cs" />
     <Compile Include="Models\MenuItem.cs" />
+    <Compile Include="Models\MitigationPlan.cs" />
     <Compile Include="Models\NoticeLog.cs" />
     <Compile Include="Models\NoticeUserLink.cs" />
     <Compile Include="Models\Page.cs" />
@@ -216,12 +217,12 @@
     <Compile Include="Models\Patch.cs" />
     <Compile Include="Models\PatchDocLink.cs" />
     <Compile Include="Models\PatchStatus.cs" />
-    <Compile Include="Models\Plan.cs" />
     <Compile Include="Models\PlanActionLink.cs" />
     <Compile Include="Models\PlanDocLink.cs" />
     <Compile Include="Models\Platform.cs" />
     <Compile Include="Models\PlatformBUGLink.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\ThemeFields.cs" />
     <Compile Include="Models\UserBUGLink.cs" />
     <Compile Include="Models\ValueList.cs" />
     <Compile Include="Models\ValueListGroup.cs" />
@@ -388,7 +389,6 @@
     <Content Include="Views\System\Pages.cshtml" />
     <Content Include="Views\System\Home.cshtml" />
     <Content Include="Views\System\MenuItems.cshtml" />
-    <Content Include="Views\Main\Patches.cshtml" />
     <Content Include="Views\System\ValueListGroups.cshtml" />
     <Content Include="Views\System\ValueListItems.cshtml" />
     <Content Include="Views\Shared\SecurityError.cshtml" />
@@ -405,9 +405,10 @@
     <Content Include="Views\Main\DiscoverPatches.cshtml" />
     <Content Include="Views\Main\PageTemplate2.cshtml" />
     <Content Include="Views\Main\History.cshtml" />
-    <Content Include="Views\Main\Plan.cshtml" />
     <Content Include="Views\Main\Notification.cshtml" />
     <Content Include="Views\Main\Done.cshtml" />
+    <Content Include="Views\Main\MitigationPlan.cshtml" />
+    <Content Include="Views\Main\ActionItem.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
