@@ -102,7 +102,7 @@
 
     ViewBag.BodyRows = BodyRows().ToString();
     ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
-    ViewBag.AddNewEditTitle = "MitigationPlan";
+    ViewBag.AddNewEditTitle = "Mitigation Plan";
 
 }
 @helper BodyRows()
@@ -184,7 +184,7 @@
             //console.log(record);
             $("#editActionItemFrame").attr({
                 "src": "@Url.Content("~/Main/ActionItem")?PlanID=" + record.ID + "&Title=" + encodeURIComponent(record.Title),
-                "height": ($(document).height() - 150) + "px",
+                "height": ($(document).height() - 250) + "px",
                 "width": "100%"
         });
 

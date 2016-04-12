@@ -42,7 +42,7 @@ namespace MiPlan.Models
 
         public int PlanID { get; set; }
 
-        [Label("Action Type")]
+        [Label("Action Status")]
         public int? ActionTypeKey { get; set; }
 
         [Label("Priority")]
@@ -58,7 +58,7 @@ namespace MiPlan.Models
         [InitialValue("new Date()")]
         public DateTime? ScheduledStartDate { get; set; }
 
-        [Label("Scheduled End Date")]
+        [Label("Due Date")]
         [Column(TypeName = "date")]
         [InitialValue("new Date()")]
         public DateTime? ScheduledEndDate { get; set; }

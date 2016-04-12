@@ -23,12 +23,24 @@
 @using System.Collections.Specialized
 @using MiPlan.Models
 @using GSF
+@using GSF.Data.Model
 @using GSF.Web.Model
 @model AppModel
 @{
     DataContext dataContext = Model.DataContext;
     NameValueCollection parameters = Request.QueryString;
     int planID = int.Parse(parameters["PlanID"] ?? "0");
+    ViewBag.planID = planID;
+    string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
+    statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
+
+
+
+    const string noneImage = "greenlight.png";
+    const string dueImage = "yellowlight.png";
+    const string pastDueImage = "redlight.png";
+    const string completedImage = "blacklight.png";
+  
 
     ViewBag.CustomTitle = "Action Items for \"" + parameters["Title"] + "\" Mitigation Plan";
     ViewBag.PageHasMenu = false;
@@ -39,8 +51,8 @@
         new[] { null, "Status", "text-center valign-middle"},
         new[] { "Title", "Title", "text-left" },
         new[] { "PriorityKey", "Priority", "text-left"},
-        new[] { "ActionTypeKey", "ActionType", "text-left" },
-        new[] { "ScheduledEndDate", "End Date", "text-left" }
+        new[] { "ActionTypeKey", "Action Status", "text-left" },
+        new[] { "ScheduledEndDate", "Due Date", "text-left" }
 
     };
 
@@ -51,10 +63,8 @@
 }
 @helper BodyRows()
 {
-    string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
-    statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
-
-    <td width="5%" class="text-center valign-middle"><img src="@(statusLightsImagePath)greenlight.png" alt="Enabled" data-bind=""><img src="@(statusLightsImagePath)disabledlight.png" alt="Disabled" data-bind=""></td>
+   
+    <td width="5%" class="text-center valign-middle"><img src="~/Images/StatusLights/Small/greenlight.png" alt="OK" title="OK" data-bind="attr: {'update-attr': getDiscoveryStatusImage($($element), $data)}"></td>
     <td width="15%" class="text-left valign-middle" nowrap><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
     <td width="20%" class="text-left valign-middle" data-bind="text: lookupPriorityValue(PriorityKey)"></td>
     <td width="20%" class="text-left valign-middle" data-bind="text: lookupActionstatusValue(ActionTypeKey)"></td>
@@ -66,29 +76,12 @@
 }
 @helper AddNewEditDialog(DataContext dataContext)
 {
-    int defaultCriticalAlarmDays;
-    string setting;
-
-    // Get default critical alarm days
-    if (!Model.Global.ApplicationSettings.TryGetValue("criticalAlarmDays", out setting) || !int.TryParse(setting, out defaultCriticalAlarmDays)) {
-        defaultCriticalAlarmDays = 3;
-    }
-
-    // Validate default value
-    defaultCriticalAlarmDays = Math.Abs(defaultCriticalAlarmDays);
-
-    if (defaultCriticalAlarmDays < 2 || defaultCriticalAlarmDays > 9) {
-        defaultCriticalAlarmDays = 3;
-    }
-
     <div class="col-md-12">
-        @Html.Raw(dataContext.AddInputField<ActionItem>("ParentID"))
-        @Html.Raw(dataContext.AddInputField<ActionItem>("PlanID"))
-        @Html.Raw(dataContext.AddInputField<ActionItem>("ActionTypeKey"))
-        @Html.Raw(dataContext.AddInputField<ActionItem>("PriorityKey"))
+        @Html.Raw(dataContext.AddSelectField<ActionItem, ActionItem>("ParentID", "ID", "Title", restriction: new RecordRestriction("PlanID = {0}", ViewBag.planID)))
+        @Html.Raw(Model.AddValueListSelectField<ActionItem>("ActionTypeKey" , "actionStatus"))
+        @Html.Raw(Model.AddValueListSelectField<ActionItem>("PriorityKey", "priority"))
         @Html.Raw(dataContext.AddInputField<ActionItem>("Title"))
         @Html.Raw(dataContext.AddTextAreaField<ActionItem>("Details"))
-        @Html.Raw(dataContext.AddDateField<ActionItem>("ScheduledStartDate"))
         @Html.Raw(dataContext.AddDateField<ActionItem>("ScheduledEndDate"))
     </div>
 }
@@ -97,14 +90,17 @@
 
 @section Scripts {
     <script>
+        "use strict";
         @Html.Raw(Model.RenderViewModelConfiguration<ActionItem>(ViewBag, "ScheduledEndDate" , planID))
         @Html.Raw(Model.RenderValueListClientLookupFunction("actionStatus"))
         @Html.Raw(Model.RenderValueListClientLookupFunction("priority"))
-        "use strict";
 
-        $(viewModel).on("beforeEdit", function(event, observableRecord) {
+
+
+        $(viewModel).on("derivingObservableRecord", function (event, observableRecord) {
             // Initialize selected menu item record
             observableRecord.PlanID(@planID);
+
         });
 
         $(function() {
@@ -122,6 +118,47 @@
                 dismissButtons.prop("disabled", false);
             });
         });
-       
+
+        function getDiscoveryStatusImage(element, record) {
+            if (record.ActionTypeKey === 3) {
+                image = "@completedImage";
+                title = "Action Complete";
+            } else {
+                const daysUntilEnd = (record.ScheduledEndDate.toDate()).daysBetween(new Date());
+
+                var image, title;
+
+                switch (true) {
+                    case (daysUntilEnd < 0):
+                        image = "@pastDueImage";
+                        title = "Past Due";
+                        break;
+                    case (daysUntilEnd < 7):
+                        image = "@dueImage";
+                        title = "Due";
+                        break;
+                    default:
+                        image = "@noneImage";
+                        title = "OK";
+                        break;
+                }
+            }
+            
+
+            element.attr("src", "@statusLightsImagePath" + image);
+            element.attr("alt", title);
+            element.attr("title", title);
+
+            return undefined;
+        }
+
+        $("#editMenuItemDialog").on("hidden.bs.modal", function () {
+            // Refresh page counts after editing tasks
+            viewModel.queryPageRecords();
+
+            // Clear frame page
+            $("#editMenuItemFrame").attr("src", "about:blank");
+        });
+
     </script>
 }
