@@ -28,12 +28,7 @@
     DataContext dataContext = Model.DataContext;
     ViewBag.HideAddNewButton = true;
 }
-
-
-
 <p>Will allow active patches to be closed once complaince evenidence is verified.</p>
-
-
 @{
     ViewBag.HeaderColumns = new[]
 {
@@ -41,6 +36,7 @@
         new[] { "Title", "SPM Reference", "text-left" },
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
         new[] { "Field1", "Title", "text-left"},
+        new[] { null, "Actions", "text-center valign-middle" },
         new[] { null, "Close", "text-center valign-middle" }
 
     };
@@ -50,25 +46,52 @@
 }
 @helper BodyRows()
 {
-        <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
-        <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
-        <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
-        <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: closePlan.bind($data)" class="btn btn-danger btn-sm">Close</button></td>
+    <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
+    <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
+    <td width="60%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: closePlan.bind($data)" class="btn btn-danger btn-sm">Close</button></td>
+
 }
 @Html.Partial("PagedViewModel")
+
+<div id="editActionItemDialog" class="modal modal-wide fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <iframe style="border: none" id="editActionItemFrame"></iframe>
+                <button type="button" class="btn btn-default pull-right popup-ok-button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        @Html.Raw(Model.RenderViewModelConfiguration<UncompletedMitigationPlan>(ViewBag))
+        @Html.Raw(Model.RenderViewModelConfiguration<PlansActionCompletedView>(ViewBag))
         @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+
 
         function closePlan(record) {
             dataHub.completeUncompletedMitigationPlan(record);
             viewModel.queryPageRecords();
         }
 
+        function openMenuItemEditor(record) {
+            //console.log(record);
+            $("#editActionItemFrame").attr({
+                "src": "@Url.Content("~/Main/ActionItem")?PlanID=" + record.ID + "&Title=" + encodeURIComponent(record.Title),
+                "height": ($(document).height() - 250) + "px",
+                "width": "100%"
+        });
+
+        $("#editActionItemDialog").modal("show");
+        }
+
         $("#editActionItemDialog").on("hidden.bs.modal", function () {
             // Refresh page counts after editing tasks
-           
+            viewModel.queryPageRecords();
 
             // Clear frame page
             $("#editActionItemFrame").attr("src", "about:blank");

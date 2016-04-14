@@ -163,14 +163,16 @@ namespace MiPlan.Controllers
 
         public ActionResult Notification()
         {
-            m_appModel.ConfigureView(Url.RequestContext, "Notification", ViewBag);
+            m_appModel.ConfigureView<NoticeLog>(Url.RequestContext, "Notification", ViewBag);
             return View();
         }
 
 
         public ActionResult Done()
         {
-            m_appModel.ConfigureView<UncompletedMitigationPlan>(Url.RequestContext, "Done", ViewBag);
+            m_appModel.ConfigureView<PlansActionCompletedView>(Url.RequestContext, "Done", ViewBag);
+            //ActionItem[] actions = m_dataContext.Table<ActionItem>().QueryRecords().ToArray();
+            //ViewBag.ActionItems = actions;
             return View();
         }
 

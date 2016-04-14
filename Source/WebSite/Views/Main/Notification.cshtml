@@ -21,11 +21,39 @@
 //
 //*****************************************************************************************************@
 @using MiPlan.Models
+@using GSF
+@using GSF.Web.Model
 @model AppModel
 @{
+    DataContext dataContext = Model.DataContext;
+    ViewBag.HideAddNewButton = true;
+}
+<p>Will display the time history of notifications.  Who received what notification email.</p>
+@{
+    ViewBag.HeaderColumns = new[]
+{
+        //    { "Field", "Label", "Classes" }
+        new[] { "PatchID", "SPM Reference", "text-left" },
+        new[] { "NoticeMethodkey", "Notice Method", "text-left"},
+        new[] { "ToUsers", "Persons Notified", "text-left"},
+        new[] { "SentOn", "Date Sent", "text-center valign-middle" }
+    };
+
+    ViewBag.BodyRows = BodyRows().ToString();
 
 }
-
-<p>Will display the time history of notifications.  Who received what notification email.</p>
-
-
+@helper BodyRows()
+{
+    <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: lookupTitleValue(PatchID), click: $parent.viewPageRecord"></button></td>
+    <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNoticemethodValue(NoticeMethodKey)"></div></td>
+    <td width="60%" class="text-left valign-middle"><div nowrap data-bind="text: ToUsers"></div></td>
+    <td width="60%" class="text-left valign-middle"><div nowrap data-bind="text: SentOn.formatDate(DateFormat)"></div></td>
+}
+@Html.Partial("PagedViewModel")
+@section Scripts {
+    <script>
+        @Html.Raw(Model.RenderViewModelConfiguration<NoticeLog>(ViewBag))
+        @Html.Raw(Model.RenderAbstract<UncompletedMitigationPlan>("Title"))
+        @Html.Raw(Model.RenderValueListClientLookupFunction("noticeMethod"))
+    </script>
+}

@@ -364,6 +364,53 @@ namespace MiPlan
 
         #endregion
 
+        #region [ NoticeLog Table Operations ]
+
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(NoticeLog), RecordOperation.QueryRecordCount)]
+        public int QueryNoticeLogCount()
+        {
+            return m_dataContext.Table<NoticeLog>().QueryRecordCount();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        public IEnumerable<NoticeLog> QueryNoticeLogs()
+        {
+            return m_dataContext.Table<NoticeLog>().QueryRecords();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(NoticeLog), RecordOperation.QueryRecords)]
+        public IEnumerable<NoticeLog> QueryNoticeLogs(string sortField, bool ascending, int page, int pageSize)
+        {
+            return m_dataContext.Table<NoticeLog>().QueryRecords(sortField, ascending, page, pageSize);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(NoticeLog), RecordOperation.DeleteRecord)]
+        public void DeleteNoticeLog(int id)
+        {
+            m_dataContext.Table<NoticeLog>().DeleteRecord(id);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(NoticeLog), RecordOperation.CreateNewRecord)]
+        public NoticeLog NewNoticeLog()
+        {
+            return new NoticeLog();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(NoticeLog), RecordOperation.AddNewRecord)]
+        public void AddNewNoticeLog(NoticeLog record)
+        {
+            record.CreatedOn = DateTime.UtcNow;
+            m_dataContext.Table<NoticeLog>().AddNewRecord(record);
+        }
+
+        #endregion
+
         #region [ Vendor Table Operations ]
 
         [RecordOperation(typeof(Vendor), RecordOperation.QueryRecordCount)]
@@ -867,6 +914,54 @@ namespace MiPlan
                 CreatedOn =  record.CreatedOn
             };
         }
+
+        #endregion
+
+        #region [ MitigationPlanActionItemsCompleted View Operations ]
+
+        [RecordOperation(typeof(MitigationPlanActionItemsCompleted), RecordOperation.QueryRecordCount)]
+        public int QueryMitigationPlanActionItemsCompletedCount()
+        {
+            return m_dataContext.Table<MitigationPlanActionItemsCompleted>().QueryRecordCount();
+        }
+
+        [RecordOperation(typeof(MitigationPlanActionItemsCompleted), RecordOperation.QueryRecords)]
+        public IEnumerable<MitigationPlanActionItemsCompleted> QueryMitigationPlanActionItemsCompleteds(string res)
+        {
+            return m_dataContext.Table<MitigationPlanActionItemsCompleted>().QueryRecords(restriction: new RecordRestriction(res));
+        }
+
+
+        [RecordOperation(typeof(MitigationPlanActionItemsCompleted), RecordOperation.CreateNewRecord)]
+        public MitigationPlanActionItemsCompleted NewMitigationPlanActionItemsCompleted()
+        {
+            return new MitigationPlanActionItemsCompleted();
+        }
+
+
+        #endregion
+
+        #region [ PlansActionCompletedView View Operations ]
+
+        [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.QueryRecordCount)]
+        public int QueryPlansActionCompletedViewCount()
+        {
+            return m_dataContext.Table<PlansActionCompletedView>().QueryRecordCount();
+        }
+
+        [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.QueryRecords)]
+        public IEnumerable<PlansActionCompletedView> QueryPlansActionCompletedViews(string sortField, bool ascending, int page, int pageSize)
+        {
+            return m_dataContext.Table<PlansActionCompletedView>().QueryRecords(sortField, ascending, page, pageSize);
+        }
+
+
+        [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.CreateNewRecord)]
+        public PlansActionCompletedView NewPlansActionCompletedView()
+        {
+            return new PlansActionCompletedView();
+        }
+
 
         #endregion
 

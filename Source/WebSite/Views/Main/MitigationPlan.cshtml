@@ -253,6 +253,9 @@
                     window.open(mailto_link, 'emailWindow');
                     //if (win && win.open && !win.closed) win.close();
                 });
+
+                var noticeRecord = { PatchID: record.ID, NoticeMethodKey: 1, ToUsers: email, Text: body_message, SentOn: (new Date()) }
+                dataHub.addNewNoticeLog(noticeRecord);
             }
         }
 
