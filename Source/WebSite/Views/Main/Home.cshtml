@@ -20,47 +20,64 @@
     //       Generated original version of source code.
     //
     //*****************************************************************************************************@
+@using GSF
 @using GSF.Web.Model
 @using MiPlan.Models
 @model AppModel
 @{
-    // DataContext is the "database connection" that is available for the page, you can
-    // use direct database calls, e.g., dataContect.Connection.RetrieveData(...) or you
-    // can use model based table operations, e.g., dataContext.Table<Page>().LoadRecord(id)
     DataContext dataContext = Model.DataContext;
+   
+
 }
-@section StyleSheets {
-    @* Include any page specific style sheets here, these will be added to page header *@
-}
-@section Scripts {
-    @* Include any page specific scripts here, these will be added to scripts at bottom of page *@
-}
+<script src="/Scripts/jquery-2.2.0.js"></script>
+
+<script src="/Scripts/bootstrap.min.js"></script>
+<script src="/Scripts/ie10-viewport-bug-workaround.js"></script>
+<script src="/Scripts/respond.js"></script>
+<script src="/Scripts/bootstrap-datepicker.min.js"></script>
+<script src="/Scripts/bootstrap-toolkit.min.js"></script>
+
+<script src="/Scripts/jquery.signalR-2.2.0.min.js"></script>
+
+<script src="/Scripts/gsf.web.client.js"></script>
+
+
+<script src="/signalr/hubs"></script>
+<script src="/Scripts/Site.js"></script>
+
+<script src="/Scripts/knockout-3.4.0.debug.js"></script>
+<script src="/Scripts/knockout.mapping-latest.debug.js"></script>
+<script src="/Scripts/knockout.validation.min.js"></script>
+<script src="/Scripts/ko-reactor.min.js"></script>
+<script src="/Scripts/ko.observableDictionary.js"></script>
+<script src="/Scripts/js.cookie.js"></script>
+
 <div class="row">
-    <div class="col-md-6"> 
-        <p>&nbsp;</p>    
+    <div class="col-md-6">
+        <p>&nbsp;</p>
         <table>
             <tr>
                 <td colspan="4"><b>Active Plans</b></td>
             </tr>
             <tr>
                 <td>&nbsp;</td>
-                <td  align="right">&nbsp;Today&nbsp;</td>
-                <td  align="right">&nbsp;&nbsp;&nbsp;&nbsp;(T-7)</td>
-                <td  align="right">&nbsp;&nbsp;&nbsp;&nbsp;(T-14)</td>
+                <td align="right">&nbsp;Today&nbsp;</td>
+                <td align="right">&nbsp;&nbsp;&nbsp;&nbsp;(T-7)</td>
+                <td align="right">&nbsp;&nbsp;&nbsp;&nbsp;(T-14)</td>
             </tr>
 
             <tr>
                 <td>Total Open Plans</td>
-                <td align="right">17</td>
-                <td align="right">20</td>
-                <td align="right">19</td>
+                <td align="right">@ViewBag.todaysOpenPlansCount</td>
+                <td align="right">@ViewBag.weekOpenPlansCount</td>
+                <td align="right">@ViewBag.twoWeekOpenPlansCount</td>
             </tr>
 
             <tr>
                 <td>Completed Plans</td>
-                <td align="right">5</td>
-                <td align="right">12</td>      
-                <td align="right">11</td>
+                <td align="right">@ViewBag.todaysCompletedPlansCount</td>
+                <td align="right">@ViewBag.weekCompletedPlansCount</td>
+                <td align="right">@ViewBag.twoWeekCompletedPlansCount</td>
             </tr>
 
         </table>
@@ -73,19 +90,19 @@
             <tr>
                 <td align="left">Plans Started</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">613</td>
+                <td align="right">@ViewBag.YTDPlansStarted</td>
             </tr>
             <tr>
                 <td align="left">Actions Completed&nbsp;&nbsp;</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">8,713</td>
+                <td align="right">@ViewBag.YTDActionsCompleted</td>
             </tr>
             <tr>
                 <td align="left">Plans Closed&nbsp;&nbsp;</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">87</td>
+                <td align="right">@ViewBag.YTDPlansClosed</td>
             </tr>
-           
+
         </table>
         <p>&nbsp;</p>
         <table>
@@ -95,26 +112,26 @@
             <tr>
                 <td align="left">Warning</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">2,034</td>
+                <td align="right">@ViewBag.YTDWarnings</td>
             </tr>
             <tr>
                 <td align="left">Alarm</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">539</td>
+                <td align="right">@ViewBag.YTDAlarms</td>
             </tr>
             <tr>
                 <td align="left">Critical Alarm</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">87</td>
+                <td align="right">@ViewBag.YTDCriticalAlarms</td>
             </tr>
             <tr>
                 <td align="left">Late&nbsp;&nbsp;</td>
                 <td>&nbsp;&nbsp;</td>
-                <td align="right">4</td>
+                <td align="right">@ViewBag.YTDLateActions</td>
             </tr>
         </table>
         <p>&nbsp;</p>
-      
+
         <p>&nbsp;</p>
         <table>
             <tr>
@@ -127,20 +144,20 @@
                         <tr>
                             <td align="left">Open Plans</td>
                             <td>&nbsp;&nbsp;</td>
-                            <td align="right">5</td>
+                            <td align="right">@ViewBag.MyOpenPlans</td>
                         </tr>
                         <tr><td colspan="3">&nbsp;</td></tr>
                         <tr>
                             <td align="left">Open Action Items</td>
                             <td>&nbsp;&nbsp;</td>
-                            <td align="right">972</td>
+                            <td align="right">@ViewBag.MyOpenAction</td>
                         </tr>
                         <tr>
                             <td align="left">Late Action Items</td>
                             <td>&nbsp;&nbsp;</td>
-                            <td align="right">2</td>
+                            <td align="right">@ViewBag.MyLateAction</td>
                         </tr>
-                      
+
 
                     </table>
                 </td>
@@ -149,8 +166,6 @@
     </div>
 
     <div class="col-md-6">
-        
-        
         <p>&nbsp;</p>
         <table>
             <tr><td colspan="4"><b>Action Items in Alarm</b></td></tr>
@@ -176,7 +191,7 @@
                 <td align="center">BU Abvr</td>
             </tr>
 
-           
+
             <tr>
                 <td align="left" width="16"><img src="~/Images/StatusLights/Small/redlight.png" width="8" /></td>
                 <td align="right">2&nbsp;&nbsp;</td>
@@ -283,3 +298,11 @@
     </div>
 
 </div>
+
+<script>
+    console.log();
+        
+
+    </script>
+
+

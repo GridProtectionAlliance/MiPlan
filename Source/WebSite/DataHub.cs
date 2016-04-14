@@ -197,6 +197,73 @@ namespace MiPlan
 
         #endregion
 
+        #region [ MitigationPlan Table Operations ]
+
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecordCount)]
+        public int QueryMitigationPlanCount(bool showDeleted)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction());
+
+            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
+        }
+
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecords)]
+        public IEnumerable<MitigationPlan> QueryMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
+
+            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.DeleteRecord)]
+        public void DeleteMitigationPlan(int id)
+        {
+            // For MitigationPlanes, we only "mark" a record as deleted
+            m_dataContext.Connection.ExecuteNonQuery("UPDATE MitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
+        }
+
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.CreateNewRecord)]
+        public MitigationPlan NewMitigationPlan()
+        {
+            return new MitigationPlan();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.AddNewRecord)]
+        public void AddNewMitigationPlan(MitigationPlan record)
+        {
+            record.CreatedByID = GetCurrentUserID();
+            record.CreatedOn = DateTime.UtcNow;
+            record.UpdatedByID = record.CreatedByID;
+            record.UpdatedOn = record.CreatedOn;
+            record.IsCompleted = false;
+            m_dataContext.Table<MitigationPlan>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
+        public void UpdateMitigationPlan(MitigationPlan record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
+        public void CompleteMitigationPlan(MitigationPlan record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = true;
+            m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
+        }
+
+        #endregion
+
         #region [ CompletedMitigationPlan Table Operations ]
 
         [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.QueryRecordCount)]
@@ -960,6 +1027,30 @@ namespace MiPlan
         public PlansActionCompletedView NewPlansActionCompletedView()
         {
             return new PlansActionCompletedView();
+        }
+
+
+        #endregion
+
+        #region [ MitigationPlanActionItemsView View Operations ]
+
+        [RecordOperation(typeof(MitigationPlanActionItemsView), RecordOperation.QueryRecordCount)]
+        public int QueryMitigationPlanActionItemsViewCount()
+        {
+            return m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecordCount();
+        }
+
+        [RecordOperation(typeof(MitigationPlanActionItemsView), RecordOperation.QueryRecords)]
+        public IEnumerable<MitigationPlanActionItemsView> QueryMitigationPlanActionItemsViews(string sortField, bool ascending, int page, int pageSize)
+        {
+            return m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecords(sortField, ascending, page, pageSize);
+        }
+
+
+        [RecordOperation(typeof(MitigationPlanActionItemsView), RecordOperation.CreateNewRecord)]
+        public MitigationPlanActionItemsView NewMitigationPlanActionItemsView()
+        {
+            return new MitigationPlanActionItemsView();
         }
 
 

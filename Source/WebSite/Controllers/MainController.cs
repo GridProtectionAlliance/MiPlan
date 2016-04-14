@@ -21,6 +21,7 @@
 //
 //******************************************************************************************************
 
+using System;
 using System.Data;
 using System.Linq;
 using System.Web.Mvc;
@@ -90,7 +91,38 @@ namespace MiPlan.Controllers
 
         public ActionResult Home()
         {
-            m_appModel.ConfigureView(Url.RequestContext, "Home", ViewBag);            
+            m_appModel.ConfigureView(Url.RequestContext, "Home", ViewBag);
+            DateTime today = DateTime.Today.AddDays(1).AddMinutes(-1);
+            DateTime yesterday = DateTime.Today.AddDays(1).AddMinutes(-1).AddDays(-1);
+            DateTime lastWeek = DateTime.Today.AddDays(-7);
+            DateTime lastTwoWeeks = DateTime.Today.AddDays(-14);
+            DateTime begYear = new DateTime(DateTime.Today.Year, 1, 1);
+            Guid userID = new DataHub().GetCurrentUserID();
+
+            ViewBag.todaysOpenPlansCount = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND CreatedON BETWEEN {0} AND {1}", yesterday, today));
+            ViewBag.weekOpenPlansCount = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND CreatedON BETWEEN {0} AND {1}", lastWeek, today));
+            ViewBag.twoWeekOpenPlansCount = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND CreatedON BETWEEN {0} AND {1}", lastTwoWeeks, today));
+            ViewBag.todaysCompletedPlansCount = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1 AND CreatedON BETWEEN {0} AND {1}", yesterday, today));
+            ViewBag.weekCompletedPlansCount = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1 AND CreatedON BETWEEN {0} AND {1}", lastWeek, today));
+            ViewBag.twoWeekCompletedPlansCount = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1 AND CreatedON BETWEEN {0} AND {1}", lastTwoWeeks, today));
+
+            ViewBag.YTDPlansStarted = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND CreatedON BETWEEN {0} AND {1}", begYear, today ));
+            ViewBag.YTDActionsCompleted = m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("ActionTypeKey = 3 AND CreatedON BETWEEN {0} AND {1}", begYear, today));
+            ViewBag.YTDPlansClosed = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND isCompleted = 1 AND CreatedON BETWEEN {0} AND {1}", begYear, today));
+
+            ViewBag.YTDWarnings = m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) < 14 AND CreatedON BETWEEN {0} AND {1}", begYear, today));
+            ViewBag.YTDAlarms = m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) < 7 AND CreatedON BETWEEN {0} AND {1}", begYear, today));
+            ViewBag.YTDCriticalAlarms = m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) < 3 AND CreatedON BETWEEN {0} AND {1}", begYear, today));
+            ViewBag.YTDLateActions = m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) <= 0 AND CreatedON BETWEEN {0} AND {1}", begYear, today));
+
+
+            ViewBag.MyOpenPlans = m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND CreatedByID = {0}", userID));
+            ViewBag.MyOpenAction = m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecordCount(new RecordRestriction("ActionTypeKey <> 3 AND CreatedByID = {0}", userID));
+            ViewBag.MyLateAction = m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecordCount(new RecordRestriction("ActionTypeKey <> 3 AND DATEDIFF(day, UpdatedOn, ScheduledEndDate)<= 0 AND CreatedByID = {0}", userID));
+
+            ViewBag.ActionsInAlarm = m_dataContext.Table<ActionItem>().QueryRecords(restriction: new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) < 14 AND ActionTypeKey <> 3"));
+            ViewBag.PlansAddedToday = m_dataContext.Table<MitigationPlan>()
+                .QueryRecords("Title", restriction: new RecordRestriction(""));
             return View();
         }
 

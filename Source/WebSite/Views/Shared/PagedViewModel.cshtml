@@ -129,51 +129,56 @@
         pageControlScripts.Append(RenderSortScript(fieldName, false));
     }
 }
-<div class="well well-dynamic-content" id="contentWell" content-fill-height>
-    <div class="table-responsive" id="responsiveTableDiv">
-        <table class="table table-condensed table-hover" id="recordsTable">
-            <thead>
-                <tr>                
-                    @foreach (string[] headerColumn in ViewBag.HeaderColumns) {
+
+   <div class="well well-dynamic-content" id="contentWell" content-fill-height>
+        <div class="table-responsive" id="responsiveTableDiv">
+            <table class="table table-condensed table-hover" id="recordsTable">
+                <thead>
+                <tr>
+                    @foreach (string[] headerColumn in ViewBag.HeaderColumns)
+                    {
                         @WriteFieldHeader(pageControlScripts, headerColumn[0], headerColumn[1], headerColumn[2])
                     }
                     <th class="text-center">
                         <button type="button" class="btn btn-link btn-xs" style="line-height: 1.1" id="clearSortOrder" data-bind="enable: dataHubIsConnected">Clear<br/>Sort</button>
                     </th>
                 </tr>
-            </thead>
-            <tbody data-bind="foreach: pageRecords">
+                </thead>
+                <tbody data-bind="foreach: pageRecords">
                 <tr style="visibility: hidden" id="recordRow"@Html.Raw(ViewBag.ShowDeleted ?? false ? $" data-bind=\"css: {{'danger': {ViewBag.IsDeletedField}}}\"" : "")>
                     @Html.Raw(ViewBag.BodyRows)
                 </tr>
-            </tbody>
-        </table>
-        <div id="loadingDataLabel">
-            Loading&nbsp;&nbsp;<span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+                </tbody>
+            </table>
+            <div id="loadingDataLabel">
+                Loading&nbsp;&nbsp;<span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+            </div>
+        </div>
+        <div class="pull-right" id="pageControlsRow">
+            @if (!hideAddNewButton && (canAddNew || !hideUnauthorizedControls))
+            {
+                <button type="button" class="btn btn-sm btn-primary pull-right" id="addRecordButton" @Html.Raw(canAddNew ? "data-bind=\"enable: dataHubIsConnected\"" : "disabled")>
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Add&nbsp;New
+                </button>
+                <br/>
+                <hr class="half-break"/>
+            }
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-default" id="firstPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-backward"></span></button>
+                <button type="button" class="btn btn-default" id="previousPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-triangle-left"></span></button>
+            </div>
+            <input type="number" class="content input-sm" style="padding: 0 0 0 5px; width: 55px" id="selectedPage" data-bind="numeric, textInput: currentPage, enable: dataHubIsConnected" value="1">
+            &nbsp;of&nbsp;
+            <span data-bind="text: totalPages">1</span>
+            &nbsp;
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-default" id="nextPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-triangle-right"></span></button>
+                <button type="button" class="btn btn-default" id="lastPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-forward"></span></button>
+            </div>
         </div>
     </div>
-    <div class="pull-right" id="pageControlsRow">
-        @if (!hideAddNewButton && (canAddNew || !hideUnauthorizedControls)) {
-            <button type="button" class="btn btn-sm btn-primary pull-right" id="addRecordButton" @Html.Raw(canAddNew ? "data-bind=\"enable: dataHubIsConnected\"" : "disabled")>
-                <span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Add&nbsp;New
-            </button>
-            <br />
-            <hr class="half-break" />
-        }
-        <div class="btn-group btn-group-sm">
-            <button type="button" class="btn btn-default" id="firstPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-backward"></span></button>
-            <button type="button" class="btn btn-default" id="previousPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-triangle-left"></span></button>
-        </div>
-        <input type="number" class="content input-sm" style="padding: 0 0 0 5px; width: 55px" id="selectedPage" data-bind="numeric, textInput: currentPage, enable: dataHubIsConnected" value="1">
-        &nbsp;of&nbsp;
-        <span data-bind="text: totalPages">1</span>
-        &nbsp;
-        <div class="btn-group btn-group-sm">
-            <button type="button" class="btn btn-default" id="nextPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-triangle-right"></span></button>
-            <button type="button" class="btn btn-default" id="lastPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-forward"></span></button>
-        </div>
-    </div>
-</div>
+
+
 <div id="addNewEditDialog" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

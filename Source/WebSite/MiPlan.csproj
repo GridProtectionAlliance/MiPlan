@@ -210,7 +210,9 @@
     <Compile Include="Models\Install.cs" />
     <Compile Include="Models\InstallDocLink.cs" />
     <Compile Include="Models\MenuItem.cs" />
+    <Compile Include="Models\MitigationPlan.cs" />
     <Compile Include="Models\MitigationPlanActionItemsCompleted.cs" />
+    <Compile Include="Models\MitigationPlanActionItemsView.cs" />
     <Compile Include="Models\NoticeLog.cs" />
     <Compile Include="Models\NoticeUserLink.cs" />
     <Compile Include="Models\Page.cs" />
