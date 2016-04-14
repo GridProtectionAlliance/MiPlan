@@ -40,6 +40,9 @@
     const string dueImage = "yellowlight.png";
     const string pastDueImage = "redlight.png";
     const string completedImage = "blacklight.png";
+    const string pendingImage = "magentalight.png";
+    const string deferredImage = "bluelight.png";
+    const string waitingImage = "greylight.png";
   
 
     ViewBag.CustomTitle = "Action Items for \"" + parameters["Title"] + "\" Mitigation Plan";
@@ -61,6 +64,33 @@
     ViewBag.BodyRows = BodyRows().ToString();
     ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
 }
+
+<!-- Modal -->
+<div id="updateModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Update Status</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select class="form-control" id="updateSelect">
+                    <option value="1">Pending</option>
+                    <option value="2">Started</option>
+                    <option value="3">Completed</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" id="updateSubmit" class="btn btn-default" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 @helper BodyRows()
 {
    
@@ -68,6 +98,7 @@
     <td width="15%" class="text-left valign-middle" nowrap><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
     <td width="20%" class="text-left valign-middle" data-bind="text: lookupPriorityValue(PriorityKey)"></td>
     <td width="20%" class="text-left valign-middle" data-bind="text: lookupActionstatusValue(ActionTypeKey)"></td>
+    @*<td width="20%" class="text-left valign-middle"><button type="button" data-bind="text: lookupActionstatusValue(ActionTypeKey), click: updateStatus" class="btn btn-danger btn-sm">Add</button></td>*@
     <td width="40%" class="text-left valign-middle" data-bind="text: ScheduledEndDate.formatDate(DateFormat)"></td>
     <td width="5%" class="text-center valign-middle" nowrap>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
@@ -78,8 +109,8 @@
 {
     <div class="col-md-12">
         @Html.Raw(dataContext.AddSelectField<ActionItem, ActionItem>("ParentID", "ID", "Title", restriction: new RecordRestriction("PlanID = {0}", ViewBag.planID)))
-        @Html.Raw(Model.AddValueListSelectField<ActionItem>("ActionTypeKey" , "actionStatus"))
         @Html.Raw(Model.AddValueListSelectField<ActionItem>("PriorityKey", "priority"))
+        @Html.Raw(Model.AddValueListSelectField<ActionItem>("ActionTypeKey", "actionStatus"))
         @Html.Raw(dataContext.AddInputField<ActionItem>("Title"))
         @Html.Raw(dataContext.AddTextAreaField<ActionItem>("Details"))
         @Html.Raw(dataContext.AddDateField<ActionItem>("ScheduledEndDate"))
@@ -91,59 +122,65 @@
 @section Scripts {
     <script>
         "use strict";
-        @Html.Raw(Model.RenderViewModelConfiguration<ActionItem>(ViewBag, "ScheduledEndDate" , planID))
+        @Html.Raw(Model.RenderViewModelConfiguration<ActionItem>(ViewBag, "ScheduledEndDate", planID))
         @Html.Raw(Model.RenderValueListClientLookupFunction("actionStatus"))
         @Html.Raw(Model.RenderValueListClientLookupFunction("priority"))
 
 
-
-        $(viewModel).on("derivingObservableRecord", function (event, observableRecord) {
+        $(viewModel).on("derivingObservableRecord", function(event, observableRecord) {
             // Initialize selected menu item record
             observableRecord.PlanID(@planID);
 
         });
 
-        $(function() {
-            $("#addNewEditDialog").on("shown.bs.modal", function() {
-                // On add/edit dialog shown, disable data-dismiss buttons on parent pop-up
-                const dismissButtons = $("#editMenuItemDialog", window.parent.document).find("button[data-dismiss]");
-                dismissButtons.prop("disabled", true);
-                dismissButtons.invisible();
-            });
+        //function updateStatus(record, element) {
+        //    $('#updateModal').modal();
+        //    $('#updateSubmit').on('click', function () {
+        //        console.log(element);
+        //        var value = document.getElementById('updateSelect').value;
+        //        var r = record;
+        //        r.ActionTypeKey = value;
+        //        element.text = lookupActionstatusValue(r.ActionTypeKey);
+        //        dataHub.updateActionItem(r);
+        //        element = null;
+        //        record = null;
+        //    });
+        //}
 
-            $("#addNewEditDialog").on("hidden.bs.modal", function() {
-                // On add/edit dialog hidden, re-enable data-dismiss buttons on parent pop-up
-                const dismissButtons = $("#editMenuItemDialog", window.parent.document).find("button[data-dismiss]");
-                dismissButtons.visible();
-                dismissButtons.prop("disabled", false);
-            });
-        });
 
         function getDiscoveryStatusImage(element, record) {
+            var image, title;
+
             if (record.ActionTypeKey === 3) {
                 image = "@completedImage";
                 title = "Action Complete";
-            } else {
+            } else if (record.ActionTypeKey === 2) {
                 const daysUntilEnd = (record.ScheduledEndDate.toDate()).daysBetween(new Date());
 
-                var image, title;
-
                 switch (true) {
-                    case (daysUntilEnd < 0):
-                        image = "@pastDueImage";
-                        title = "Past Due";
-                        break;
-                    case (daysUntilEnd < 7):
-                        image = "@dueImage";
-                        title = "Due";
-                        break;
-                    default:
-                        image = "@noneImage";
-                        title = "OK";
-                        break;
+                case (daysUntilEnd < 0):
+                    image = "@pastDueImage";
+                    title = "Past Due";
+                    break;
+                case (daysUntilEnd < 7):
+                    image = "@dueImage";
+                    title = "Due";
+                    break;
+                default:
+                    image = "@noneImage";
+                    title = "OK";
+                    break;
                 }
+            } else if (record.ActionTypeKey === 1) {
+                image = "@pendingImage";
+                title = "Pending Approval";
+            } else if (record.ActionTypeKey === 5) {
+                image = "@deferredImage";
+                title = "Deferred";
+            } else if (record.ActionTypeKey === 4) {
+                image = "@waitingImage";
+                title = "Waiting";
             }
-            
 
             element.attr("src", "@statusLightsImagePath" + image);
             element.attr("alt", title);
@@ -152,13 +189,14 @@
             return undefined;
         }
 
-        $("#editMenuItemDialog").on("hidden.bs.modal", function () {
-            // Refresh page counts after editing tasks
-            viewModel.queryPageRecords();
-
-            // Clear frame page
-            $("#editMenuItemFrame").attr("src", "about:blank");
-        });
-
+        //$('#updateModal').on('show.bs.modal', function() {
+            
+        //});
+        //$('#updateModal').on('hide.bs.modal', function (event, observableRecord) {
+        //    $('#updateSelect').off('click');
+        //    viewModel.queryPageRecords();
+        //    // Clear frame page
+        //    $("#editActionItemFrame").attr("src", "about:blank");
+        //});
     </script>
 }

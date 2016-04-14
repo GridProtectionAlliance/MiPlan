@@ -1,7 +1,7 @@
-//******************************************************************************************************
+﻿//******************************************************************************************************
 //  Plan.cs - Gbtc
 //
-//  Copyright � 2016, Grid Protection Alliance.  All Rights Reserved.
+//  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
 //
 //  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
 //  the NOTICE file distributed with this work for additional information regarding copyright ownership.
@@ -33,7 +33,8 @@ namespace MiPlan.Models
     /// </summary>
     [PrimaryLabel("Summary")]
     [IsDeletedFlag("IsDeleted")]
-    public class MitigationPlan
+    [TableName("MitigationPlan")]
+    public class CompletedMitigationPlan
     {
         [PrimaryKey(true)]
         public int ID { get; set; }

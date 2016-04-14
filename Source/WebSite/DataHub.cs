@@ -197,58 +197,108 @@ namespace MiPlan
 
         #endregion
 
-        #region [ MitigationPlan Table Operations ]
+        #region [ CompletedMitigationPlan Table Operations ]
 
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecordCount)]
-        public int QueryMitigationPlanCount(bool showDeleted)
+        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.QueryRecordCount)]
+        public int QueryCompletedMitigationPlanCount(bool showDeleted)
         {
             if (showDeleted)
-                return m_dataContext.Table<MitigationPlan>().QueryRecordCount();
+                return m_dataContext.Table<CompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = 1"));
 
-            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
+            return m_dataContext.Table<CompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1") );
         }
 
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecords)]
-        public IEnumerable<MitigationPlan> QueryMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
+        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.QueryRecords)]
+        public IEnumerable<CompletedMitigationPlan> QueryCompletedMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
         {
             if (showDeleted)
-                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
+                return m_dataContext.Table<CompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
 
-            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+            return m_dataContext.Table<CompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1"));
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.DeleteRecord)]
-        public void DeleteMitigationPlan(int id)
+        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.DeleteRecord)]
+        public void DeleteCompletedMitigationPlan(int id)
+        {
+            // For MitigationPlanes, we only "mark" a record as deleted
+            m_dataContext.Connection.ExecuteNonQuery("UPDATE CompletedMitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.UpdateRecord)]
+        public void UpdateCompletedMitigationPlan(CompletedMitigationPlan record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            m_dataContext.Table<CompletedMitigationPlan>().UpdateRecord(record);
+        }
+
+        #endregion
+
+        #region [ UncompletedMitigationPlan Table Operations ]
+
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.QueryRecordCount)]
+        public int QueryUncompletedMitigationPlanCount(bool showDeleted)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = 0"));
+
+            return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0"));
+        }
+
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.QueryRecords)]
+        public IEnumerable<UncompletedMitigationPlan> QueryUncompletedMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
+
+            return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0"));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.DeleteRecord)]
+        public void DeleteUncompletedMitigationPlan(int id)
         {
             // For MitigationPlanes, we only "mark" a record as deleted
             m_dataContext.Connection.ExecuteNonQuery("UPDATE MitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
         }
 
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.CreateNewRecord)]
-        public MitigationPlan NewMitigationPlan()
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.CreateNewRecord)]
+        public UncompletedMitigationPlan NewUncompeletedMitigationPlan()
         {
-            return new MitigationPlan();
+            return new UncompletedMitigationPlan();
         }
 
         [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.AddNewRecord)]
-        public void AddNewMitigationPlan(MitigationPlan record)
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.AddNewRecord)]
+        public void AddNewUncompletedMitigationPlan(UncompletedMitigationPlan record)
         {
             record.CreatedByID = GetCurrentUserID();
             record.CreatedOn = DateTime.UtcNow;
             record.UpdatedByID = record.CreatedByID;
             record.UpdatedOn = record.CreatedOn;
-            m_dataContext.Table<MitigationPlan>().AddNewRecord(record);
+            record.IsCompleted = false;
+            m_dataContext.Table<UncompletedMitigationPlan>().AddNewRecord(record);
         }
 
         [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
-        public void UpdateMitigationPlan(MitigationPlan record)
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.UpdateRecord)]
+        public void UpdateUncompletedMitigationPlan(UncompletedMitigationPlan record)
         {
             record.UpdatedByID = GetCurrentUserID();
             record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
+            m_dataContext.Table<UncompletedMitigationPlan>().UpdateRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.UpdateRecord)]
+        public void CompleteUncompletedMitigationPlan(UncompletedMitigationPlan record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = true;
+            m_dataContext.Table<UncompletedMitigationPlan>().UpdateRecord(record);
         }
 
         #endregion
@@ -261,6 +311,12 @@ namespace MiPlan
         public int QueryActionItemCount(int parentID)
         {
             return m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("PlanID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        public IEnumerable<ActionItem> QueryActionItems(int parentID)
+        {
+            return m_dataContext.Table<ActionItem>().QueryRecords(restriction: new RecordRestriction("PlanID = {0}", parentID));
         }
 
         [AuthorizeHubRole("Administrator")]
@@ -292,6 +348,7 @@ namespace MiPlan
             record.CreatedByID = GetCurrentUserID();
             record.UpdatedOn = record.CreatedOn;
             record.UpdatedByID = record.CreatedByID;
+            record.ActionTypeKey = 1;
             m_dataContext.Table<ActionItem>().AddNewRecord(record);
         }
 

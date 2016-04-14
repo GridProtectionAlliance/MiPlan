@@ -21,11 +21,61 @@
 //
 //*****************************************************************************************************@
 @using MiPlan.Models
+@using GSF
+@using GSF.Web.Model
 @model AppModel
 @{
-
+    DataContext dataContext = Model.DataContext;
+    ViewBag.HideAddNewButton = true;
 }
+
+
 
 <p>Will allow active patches to be closed once complaince evenidence is verified.</p>
 
 
+@{
+    ViewBag.HeaderColumns = new[]
+{
+        //    { "Field", "Label", "Classes" }
+        new[] { "Title", "SPM Reference", "text-left" },
+        new[] { "BusinessUnitID", "Busness Unit", "text-left"},
+        new[] { "Field1", "Title", "text-left"},
+        new[] { null, "Close", "text-center valign-middle" }
+
+    };
+
+    ViewBag.BodyRows = BodyRows().ToString();
+
+}
+@helper BodyRows()
+{
+        <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
+        <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
+        <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
+        <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: closePlan.bind($data)" class="btn btn-danger btn-sm">Close</button></td>
+}
+@Html.Partial("PagedViewModel")
+@section Scripts {
+    <script>
+        @Html.Raw(Model.RenderViewModelConfiguration<UncompletedMitigationPlan>(ViewBag))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+
+        function closePlan(record) {
+            dataHub.completeUncompletedMitigationPlan(record);
+            viewModel.queryPageRecords();
+        }
+
+        $("#editActionItemDialog").on("hidden.bs.modal", function () {
+            // Refresh page counts after editing tasks
+           
+
+            // Clear frame page
+            $("#editActionItemFrame").attr("src", "about:blank");
+        });
+
+        $(function () {
+            $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
+        });
+    </script>
+}

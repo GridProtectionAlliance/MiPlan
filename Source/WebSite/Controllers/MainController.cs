@@ -148,19 +148,18 @@ namespace MiPlan.Controllers
 
         public ActionResult History()
         {
-            m_appModel.ConfigureView(Url.RequestContext, "History", ViewBag);
+            m_appModel.ConfigureView<CompletedMitigationPlan>(Url.RequestContext, "History", ViewBag);
             return View();
         }
 
         public ActionResult MitigationPlan()
         {
-            m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
-            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords( "FieldName", new RecordRestriction("ThemeID = {0}", 12)).ToArray();
+            m_appModel.ConfigureView<UncompletedMitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", 12)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = 12"));
             return View();
         }
-
 
         public ActionResult Notification()
         {
@@ -171,7 +170,7 @@ namespace MiPlan.Controllers
 
         public ActionResult Done()
         {
-            m_appModel.ConfigureView(Url.RequestContext, "Done", ViewBag);
+            m_appModel.ConfigureView<UncompletedMitigationPlan>(Url.RequestContext, "Done", ViewBag);
             return View();
         }
 

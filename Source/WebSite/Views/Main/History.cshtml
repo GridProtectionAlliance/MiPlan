@@ -21,12 +21,42 @@
 //
 //*****************************************************************************************************@
 @using MiPlan.Models
+@using GSF
+@using GSF.Web.Model
 @model AppModel
 @{
-
-  
+    DataContext dataContext = Model.DataContext;
+    ViewBag.HideAddNewButton = true;
 }
 
 <p>To be developed.  Will enable browsing of inactive patches.  A new menu will be provided to produce complaince evenidence reports.</p>
 
 
+@{
+    ViewBag.HeaderColumns = new[]
+{
+        //    { "Field", "Label", "Classes" }
+        new[] { "Title", "SPM Reference", "text-left" },
+        new[] { "BusinessUnitID", "Busness Unit", "text-left"},
+        new[] { "Field1", "Title", "text-left"},
+        new[] { null, "Add Documents", "text-center valign-middle" }
+
+    };
+
+    ViewBag.BodyRows = BodyRows().ToString();
+
+}
+@helper BodyRows()
+{
+    <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
+    <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
+    <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="" class="btn btn-danger btn-sm">Add</button></td>    
+}
+@Html.Partial("PagedViewModel")
+@section Scripts {
+    <script>
+        @Html.Raw(Model.RenderViewModelConfiguration<CompletedMitigationPlan>(ViewBag))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+    </script>
+}

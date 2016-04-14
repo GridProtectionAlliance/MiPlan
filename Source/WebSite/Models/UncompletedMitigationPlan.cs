@@ -33,7 +33,8 @@ namespace MiPlan.Models
     /// </summary>
     [PrimaryLabel("Summary")]
     [IsDeletedFlag("IsDeleted")]
-    public class MitigationPlan
+    [TableName("MitigationPlan")]
+    public class UncompletedMitigationPlan
     {
         [PrimaryKey(true)]
         public int ID { get; set; }

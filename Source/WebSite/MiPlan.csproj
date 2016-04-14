@@ -48,20 +48,20 @@
       <HintPath>..\packages\ExpressionEvaluator.2.0.3.0\lib\net40\ExpressionEvaluator.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Core, Version=2.1.192.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Core.2.1.192-beta\lib\net46\GSF.Core.dll</HintPath>
+    <Reference Include="GSF.Core, Version=2.1.213.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Core.2.1.213-beta\lib\net46\GSF.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Security, Version=2.1.192.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Security.2.1.192-beta\lib\net46\GSF.Security.dll</HintPath>
+    <Reference Include="GSF.Security, Version=2.1.213.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Security.2.1.213-beta\lib\net46\GSF.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.ServiceModel, Version=2.1.192.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.ServiceModel.2.1.192-beta\lib\net46\GSF.ServiceModel.dll</HintPath>
+    <Reference Include="GSF.ServiceModel, Version=2.1.213.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.ServiceModel.2.1.213-beta\lib\net46\GSF.ServiceModel.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Web, Version=2.1.192.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Web.2.1.192-beta\lib\net46\GSF.Web.dll</HintPath>
+    <Reference Include="GSF.Web, Version=2.1.212.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Web.2.1.212-beta\lib\net46\GSF.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -203,13 +203,13 @@
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Models\Assessment.cs" />
     <Compile Include="Models\BusinessUnit.cs" />
+    <Compile Include="Models\CompletedMitigationPlan.cs" />
     <Compile Include="Models\DiscoveryResult.cs" />
     <Compile Include="Models\Document.cs" />
     <Compile Include="Models\GlobalSettings.cs" />
     <Compile Include="Models\Install.cs" />
     <Compile Include="Models\InstallDocLink.cs" />
     <Compile Include="Models\MenuItem.cs" />
-    <Compile Include="Models\MitigationPlan.cs" />
     <Compile Include="Models\NoticeLog.cs" />
     <Compile Include="Models\NoticeUserLink.cs" />
     <Compile Include="Models\Page.cs" />
@@ -223,6 +223,7 @@
     <Compile Include="Models\PlatformBUGLink.cs" />
     <Compile Include="Models\Settings.cs" />
     <Compile Include="Models\ThemeFields.cs" />
+    <Compile Include="Models\UncompletedMitigationPlan.cs" />
     <Compile Include="Models\UserBUGLink.cs" />
     <Compile Include="Models\ValueList.cs" />
     <Compile Include="Models\ValueListGroup.cs" />
