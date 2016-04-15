@@ -215,6 +215,12 @@ namespace MiPlan.Controllers
             return View();
         }
 
+        public ActionResult PlanView()
+        {
+            m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "PlanView", ViewBag);
+            return View();
+        }
+
         #endregion
     }
 }

@@ -414,6 +414,7 @@
     <Content Include="Views\Main\Done.cshtml" />
     <Content Include="Views\Main\MitigationPlan.cshtml" />
     <Content Include="Views\Main\ActionItem.cshtml" />
+    <Content Include="Views\Main\PlanView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -289,7 +289,7 @@
     function openModal(record) {
         //console.log(record);
         $("#detailsModalFrame").attr({
-            "src": "@Url.Content("~/Main/MitigationPlan/Edit")?ID=" + record.ID,
+            "src": "@Url.Content("~/Main/PlanView")?ID=" + record.ID + "&Title=" + encodeURIComponent(record.Title),
             "height": ($(document).height() - 250) + "px",
             "width": "100%"
     });
