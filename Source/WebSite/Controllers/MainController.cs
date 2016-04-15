@@ -120,9 +120,10 @@ namespace MiPlan.Controllers
             ViewBag.MyOpenAction = m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecordCount(new RecordRestriction("ActionTypeKey <> 3 AND CreatedByID = {0}", userID));
             ViewBag.MyLateAction = m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecordCount(new RecordRestriction("ActionTypeKey <> 3 AND DATEDIFF(day, UpdatedOn, ScheduledEndDate)<= 0 AND CreatedByID = {0}", userID));
 
-            ViewBag.ActionsInAlarm = m_dataContext.Table<ActionItem>().QueryRecords(restriction: new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) < 14 AND ActionTypeKey <> 3"));
-            ViewBag.PlansAddedToday = m_dataContext.Table<MitigationPlan>()
-                .QueryRecords("Title", restriction: new RecordRestriction(""));
+            ActionItem[] actions = m_dataContext.Table<ActionItem>().QueryRecords("ScheduledEndDate ASC", true, 1, 20, restriction: new RecordRestriction("DATEDIFF(day, UpdatedOn, ScheduledEndDate) < 14 AND ActionTypeKey <> 3")).ToArray();
+            ViewBag.ActionsInAlarm = actions;
+            MitigationPlan[] plans = m_dataContext.Table<MitigationPlan>().QueryRecords("Title", restriction: new RecordRestriction("DATEDIFF(day, CreatedOn, {0}) < 1", today)).ToArray();
+            ViewBag.PlansAddedToday = plans;
             return View();
         }
 

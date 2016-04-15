@@ -26,7 +26,22 @@
 @model AppModel
 @{
     DataContext dataContext = Model.DataContext;
-   
+
+    string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
+    statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
+
+
+
+    const string noneImage = "greenlight.png";
+    const string dueImage = "yellowlight.png";
+    const string pastDueImage = "redlight.png";
+    const string amberImage = "amberlight.png";
+    const string completedImage = "blacklight.png";
+    const string pendingImage = "magentalight.png";
+    const string deferredImage = "bluelight.png";
+    const string waitingImage = "greylight.png";
+
+
 
 }
 <script src="/Scripts/jquery-2.2.0.js"></script>
@@ -169,140 +184,118 @@
         <p>&nbsp;</p>
         <table>
             <tr><td colspan="4"><b>Action Items in Alarm</b></td></tr>
-            <tr>
-                <td align="left" width="16">&nbsp;</td>
-                <td align="center">&nbsp;<u>ToGo Days</u>&nbsp;</td>
-                <td align="center">&nbsp;<u>&nbsp;&nbsp;Type&nbsp;&nbsp;</u>&nbsp;</td>
-                <td align="center"><u>&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;</u></td>
-            </tr>
 
             <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/blacklight.png" width="8" /></td>
-                <td align="right">-20&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
+                <td align="center" width="5%">&nbsp;</td>
+                <td align="center" width="25%">&nbsp;<u>&nbsp;&nbsp;To&nbsp;Go&nbsp;Days&nbsp;&nbsp;</u>&nbsp;</td>
+                <td align="left" width="30%">&nbsp;<u>&nbsp;&nbsp;Patch&nbsp;ID&nbsp;&nbsp;</u>&nbsp;</td>
+                <td align="left" width="40%">&nbsp;<u>&nbsp;&nbsp;Action&nbsp;Title&nbsp;&nbsp;</u>&nbsp;</td>
             </tr>
-
-
+            <tbody  data-bind="foreach: actions">
             <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/blacklight.png" width="8" /></td>
-                <td align="right">-3&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
+                <td width="5%" class="text-center valign-middle"><img src="~/Images/StatusLights/Small/greenlight.png" alt="OK" title="OK" data-bind="attr: {'update-attr': getDiscoveryStatusImage($($element), $data)}"></td>
+                <td align="center" width="25%" data-bind="text: dateFixer(ScheduledEndDate)"></td>
+                <td align="left" width="30%" data-bind="text: lookupTitleValue(PlanID)"></td>
+                <td align="left" width="40%" data-bind="text: Title"></td>
             </tr>
-
-
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/redlight.png" width="8" /></td>
-                <td align="right">2&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/redlight.png" width="8" /></td>
-                <td align="right">3&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/redlight.png" width="8" /></td>
-                <td align="right">4&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">5&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">6&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">7&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">8&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">9&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">9&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">9&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-            <tr>
-                <td align="left" width="16"><img src="~/Images/StatusLights/Small/amberlight.png" width="8" /></td>
-                <td align="right">10&nbsp;&nbsp;</td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
+            </tbody>
         </table>
 
         <p>&nbsp;</p>
         <table>
             <tr><td colspan="3" align="left"><b>Plans Added Today</b></td></tr>
             <tr>
-                <td align="center">&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;&nbsp;</td>
-                <td align="center">&nbsp;&nbsp;<u>&nbsp;&nbsp;Platform&nbsp;&nbsp;</u>&nbsp;&nbsp;</td>
-                <td align="center">&nbsp;&nbsp;<u>&nbsp;&nbsp;Vendor&nbsp;&nbsp;</u>&nbsp;&nbsp;</td>
+                <td width="33%" align="center">&nbsp;&nbsp;<u>&nbsp;&nbsp;&nbsp;&nbsp;ID&nbsp;&nbsp;&nbsp;&nbsp;</u>&nbsp;&nbsp;</td>
+                <td width="33%" align="center">&nbsp;&nbsp;<u>&nbsp;&nbsp;Business&nbsp;Unit&nbsp;&nbsp;</u>&nbsp;&nbsp;</td>
+                <td width="34%" align="center">&nbsp;&nbsp;<u>&nbsp;&nbsp;Title&nbsp;&nbsp;</u>&nbsp;&nbsp;</td>
             </tr>
 
-            <tr>
-                <td align="center"><a href="#temp">TVA-16-534</a></td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-
-            <tr>
-                <td align="center"><a href="#temp">TVA-16-535</a></td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-
-            <tr>
-                <td align="center"><a href="#temp">TVA-16-536</a></td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-
-            <tr>
-                <td align="center"><a href="#temp">TVA-16-537</a></td>
-                <td align="center">Plan ID</td>
-                <td align="center">BU Abvr</td>
-            </tr>
-
-    </div>
+            <tbody data-bind="foreach: plans">
+                <tr>
+                    <td width="33%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: openModal.bind($data)"></button></td>
+                    <td align="center" width="33%" data-bind="text: lookupNameValue(BusinessUnitID)"></td>
+                    <td align="center" width="34% "data-bind="text: Field1"></td>
+                </tr>
+            </tbody>
+             </table>
 
 </div>
 
-<script>
-    console.log();
-        
+</div>
 
+<!-- Modal -->
+<div id="detailsModal" class="modal modal-wide fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <iframe style="border: none" id="detailsModalFrame"></iframe>
+                <button type="button" class="btn btn-default pull-right popup-ok-button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    @Html.Raw(Model.RenderAbstract<MitigationPlan>("Title"))
+    @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+
+    function HomePageViewModel() {
+        var self = this;
+  
+      
+        self.actions = ko.observableArray(@Html.Raw(Json.Encode(ViewBag.ActionsInAlarm)));
+        self.plans = ko.observableArray(@Html.Raw(Json.Encode(ViewBag.PlansAddedToday)));
+    }
+
+    ko.applyBindings(new HomePageViewModel());
+
+    function dateFixer(date) {
+        var str = date.slice(6, date.length - 2);
+        var newDate = new Date().setTime(str);
+        var today = new Date();
+        var ret = ((newDate - today) / 1000 / 60 / 60 / 24).toFixed(0);
+        return ret;
+    }
+
+    function getDiscoveryStatusImage(element, record) {
+        var image, title;
+
+        var daysUntilEnd = (dateFixer(record.ScheduledEndDate));
+
+            switch (true) {
+                case (daysUntilEnd < 0):
+                    image = "@pastDueImage";
+                    title = "Past Due";
+                    break;
+                case (daysUntilEnd < 7):
+                    image = "@dueImage";
+                    title = "Due";
+                    break;
+                default:
+                    image = "@noneImage";
+                    title = "Coming Due";
+                    break;
+             
+            }
+       
+        element.attr("src", "@statusLightsImagePath" + image);
+        element.attr("alt", title);
+        element.attr("title", title);
+
+        return undefined;
+    }
+
+    function openModal(record) {
+        //console.log(record);
+        $("#detailsModalFrame").attr({
+            "src": "@Url.Content("~/Main/MitigationPlan/Edit")?ID=" + record.ID,
+            "height": ($(document).height() - 250) + "px",
+            "width": "100%"
+    });
+
+    $("#detailsModal").modal("show");
+    }
     </script>
 
 
