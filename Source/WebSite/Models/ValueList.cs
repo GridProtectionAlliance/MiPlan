@@ -45,6 +45,7 @@ namespace MiPlan.Models
         }
 
         [Label("Key (Option Value)")]
+        [UseEscapedName]
         public int Key
         {
             get; set;

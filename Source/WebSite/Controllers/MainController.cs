@@ -187,10 +187,11 @@ namespace MiPlan.Controllers
 
         public ActionResult MitigationPlan()
         {
+            int themeID = 13;
             m_appModel.ConfigureView<UncompletedMitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
-            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", 12)).ToArray();
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
-            ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = 12"));
+            ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             return View();
         }
 

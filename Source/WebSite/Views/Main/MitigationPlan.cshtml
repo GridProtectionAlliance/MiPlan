@@ -41,7 +41,7 @@
     const string waitingImage = "greylight.png";
 
 }
-<p>&nbsp;</p>
+@*<p>&nbsp;</p>
 <ul>
     <li>A list of "open" mitigation plans will be displayed.</li>
     <li>A filter will be available at the top of the screen for "Business Unit" and default to the BUCs or SMEs BU -- or to "all" for everyone else.</li>
@@ -80,8 +80,8 @@
         </tr>
        
     </tbody>
-</table>
-<p>&nbsp;</p>
+</table>*@
+@*<p>&nbsp;</p>
 <table class="table">
     <thead>
         <tr>
@@ -100,7 +100,7 @@
         </tr>
        
     </tbody>
-</table>
+</table>*@
 
 @{
     ViewBag.HeaderColumns = new[]
@@ -179,19 +179,23 @@
             // flag = 4 is action complete status (black light)
             // flag = 5 is pending (magenta light)
             if (viewModel.dataHubIsConnected()) {
-                dataHub.queryActionItems(record.ID).done(function(data) {
-                    data.forEach(function(i) {
-                        const days = (i.ScheduledEndDate.toDate()).daysBetween(new Date());
-                        if (i.ActionTypeKey === 1) {
-                            flag = 5;
-                        }
-                        else if (days < 0 && i.ActionTypeKey !== 3) flag = 1;
-                        else if (days < 7 && flag !== 1 && i.ActionTypeKey !== 3) flag = 2;
-                        else if (days >= 7 && (flag > 2 || flag === 0) && i.ActionTypeKey !== 3) flag = 3;
+                dataHub.queryActionItems(record.ID).done(function (data) {
+                    if (data.length === 0) {
+                        flag = 6;
+                    } else {
+                        data.forEach(function (i) {
+                            const days = (i.ScheduledEndDate.toDate()).daysBetween(new Date());
+                            if (i.ActionTypeKey === 1) {
+                                flag = 5;
+                            } else if (days < 0 && i.ActionTypeKey !== 3) flag = 1;
+                            else if (days < 7 && flag !== 1 && i.ActionTypeKey !== 3) flag = 2;
+                            else if (days >= 7 && (flag > 2 || flag === 0) && i.ActionTypeKey !== 3) flag = 3;
 
+                            //console.log(flag);
+                        });
                         //console.log(flag);
-                    });
-                    //console.log(flag);
+                    }
+                   
                     if (flag === 1) {
                         image = "@pastDueImage";
                         title = "Actions are past due";
@@ -205,7 +209,10 @@
                         image = "@pendingImage";
                         title = "Actions pending approval";
 
-                    } else {
+                    } else if (flag === 6) {
+                        image = "@waitingImage";
+                        title = "No Actions submitted";
+                    }else {
                         image = "@completedImage";
                         title = "All Actions Complete";
                     }
@@ -230,43 +237,54 @@
         }
 
         function openStartTracking(record) {
-            //console.log(record);
-            var email = 'bernest@gridprotectionalliance.org';
-            var subject = 'Action pending Approval for ' + record.Title;
-            var body_message = "NOTIFICATION: %0A%0A" +
-                "There are actions pending your approval for the following mitigation plan...%0A%0A" +
-                "Plan: " + record.Title + "%0A" +
-                "Business Unit: " + lookupNameValue(record.BusinessUnitID) + "%0A" +
-                "Description: " + record.Description + "%0A%0A" +
-                "Actions Pending Approval: %0A";
-
-
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryActionItems(record.ID).done(function(data) {
                     data.forEach(function(i) {
                         //console.log(i);
-                        if (i.ActionTypeKey === 1)
-                            body_message += " - Title: " + i.Title + "  Details: " + i.Details + "%0A";
-
+                        ++i.ActionTypeKey;
+                        dataHub.updateActionItem(i).done(function() {
+                            $(window).trigger("updatePage");
+                        });
                     });
-                    var mailto_link = 'mailto:' + email + '?subject=' + subject + '&body=' + body_message;
-                    window.open(mailto_link, 'emailWindow');
-                    //if (win && win.open && !win.closed) win.close();
-                });
 
-                var noticeRecord = { PatchID: record.ID, NoticeMethodKey: 1, ToUsers: email, Text: body_message, SentOn: (new Date()) }
-                dataHub.addNewNoticeLog(noticeRecord);
+                });
             }
+
+            //console.log(record);
+            //    var email = 'bernest@gridprotectionalliance.org';
+            //    var subject = 'Plan pending Approval for ' + record.Title;
+            //    var body_message = "NOTIFICATION: %0A%0A" +
+            //        "The following  mitigation plan is pending approval...%0A%0A" +
+            //        "Plan: " + record.Title + "%0A" +
+            //        "Business Unit: " + lookupNameValue(record.BusinessUnitID) + "%0A" +
+            //        "Description: " + record.Description + "%0A%0A" +
+            //        "Actions: %0A";
+
+
+            //    if (viewModel.dataHubIsConnected()) {
+            //        dataHub.queryActionItems(record.ID).done(function(data) {
+            //            data.forEach(function(i) {
+            //                //console.log(i);
+            //                body_message += " - Title: " + i.Title + "  Details: " + i.Details + "%0A";
+            //            });
+            //            var mailto_link = 'mailto:' + email + '?subject=' + subject + '&body=' + body_message;
+            //            window.open(mailto_link, 'emailWindow');
+            //            //if (win && win.open && !win.closed) win.close();
+            //        });
+
+            //        var noticeRecord = { PatchID: record.ID, NoticeMethodKey: 1, ToUsers: email, Text: body_message, SentOn: (new Date()) }
+            //        dataHub.addNewNoticeLog(noticeRecord);
+            //    }
         }
 
         function getActionStatusKey(record, element) {
             if (viewModel.dataHubIsConnected()) {
-                dataHub.queryActionItems(record.ID).done(function (data) {
-                    data.forEach(function(i) {if (i.ActionTypeKey === 1) element.show();});
-                 
+                dataHub.queryActionItems(record.ID).done(function(data) {
+                    data.forEach(function(i) { if (i.ActionTypeKey === 1) element.show(); });
+
                 });
             }
-            
+
         }
 
         function getActionItemCount(pageID, element) {
@@ -314,7 +332,11 @@
             $("#editActionItemFrame").attr("src", "about:blank");
         });
 
-        $(function() {
+        $(function () {
+            $(window).on("updatePage", function() {
+                viewModel.queryPageRecords();
+            });
+
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
         });
     </script>
