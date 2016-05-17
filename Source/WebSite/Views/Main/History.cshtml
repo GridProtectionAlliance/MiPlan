@@ -89,7 +89,7 @@
         function openMenuItemEditor(record) {
             //console.log(record);
             $("#editActionItemFrame").attr({
-                "src": "@Url.Content("~/Main/ActionItem")?PlanID=" + record.ID + "&Title=" + encodeURIComponent(record.Title),
+                "src": "@Url.Content("~/Main/ActionItem")?PlanID=" + record.ID + "&Title=" + encodeURIComponent(record.Title) + "&HideButton=true",
                 "height": ($(document).height() - 250) + "px",
                 "width": "100%"
         });

@@ -30,6 +30,7 @@
     DataContext dataContext = Model.DataContext;
     NameValueCollection parameters = Request.QueryString;
     int planID = int.Parse(parameters["PlanID"] ?? "0");
+    bool hideButton = bool.Parse(parameters["HideButton"] ?? "false");
     ViewBag.planID = planID;
     string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
     statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
@@ -43,7 +44,7 @@
     const string pendingImage = "magentalight.png";
     const string deferredImage = "bluelight.png";
     const string waitingImage = "greylight.png";
-  
+
 
     ViewBag.CustomTitle = "Action Items for \"" + parameters["Title"] + "\" Mitigation Plan";
     ViewBag.PageHasMenu = false;
@@ -63,6 +64,10 @@
 
     ViewBag.BodyRows = BodyRows().ToString();
     ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
+    ViewBag.HideAddNewButton = hideButton;
+    ViewBag.CanEdit = !hideButton;
+    ViewBag.CanDelete = !hideButton;
+
 }
 
 <!-- Modal -->
