@@ -225,24 +225,30 @@ namespace MiPlan
         #region [ ActionItem Table Operations ]
 
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         [RecordOperation(typeof(ActionItem), RecordOperation.QueryRecordCount)]
         public int QueryActionItemCount(int parentID, string filterText)
         {
             return m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("PlanID = {0}", parentID));
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         public IEnumerable<ActionItem> QueryActionItems(int parentID)
         {
             return m_dataContext.Table<ActionItem>().QueryRecords(restriction: new RecordRestriction("PlanID = {0}", parentID));
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         [RecordOperation(typeof(ActionItem), RecordOperation.QueryRecords)]
         public IEnumerable<ActionItem> QueryActionItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<ActionItem>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("PlanID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        public int GetLastActionItemID()
+        {
+            return m_dataContext.Connection.ExecuteScalar<int?>("SELECT IDENT_CURRENT('ActionItem')") ?? 0;
         }
 
         [AuthorizeHubRole("Administrator")]
@@ -831,6 +837,18 @@ namespace MiPlan
         [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC, Viewer")]
         [RecordOperation(typeof(MitigationPlanDocument), RecordOperation.UpdateRecord)]
         public void UpdatePatchDocument(MitigationPlanDocument record)
+        {
+            // Stub function exists to assign rights to file upload operations
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region [ ActionItemDocument Table Operations ]
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC, Viewer")]
+        [RecordOperation(typeof(ActionItemDocument), RecordOperation.UpdateRecord)]
+        public void UpdateActionItemDocument(ActionItemDocument record)
         {
             // Stub function exists to assign rights to file upload operations
             throw new NotImplementedException();

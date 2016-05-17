@@ -26,6 +26,11 @@
 @using GSF.Data.Model
 @using GSF.Web.Model
 @model AppModel
+@section StyleSheets {
+    @Styles.Render("~/css.bundle/fileinput")
+}
+
+
 @{
     DataContext dataContext = Model.DataContext;
     NameValueCollection parameters = Request.QueryString;
@@ -56,7 +61,9 @@
         new[] { "Title", "Title", "text-left" },
         new[] { "PriorityKey", "Priority", "text-left"},
         new[] { "ActionTypeKey", "Action Status", "text-left" },
-        new[] { "ScheduledEndDate", "Due Date", "text-left" }
+        new[] { "ScheduledEndDate", "Due Date", "text-left" },
+        new[] { null, "Documents", "text-center valign-middle" }
+
 
     };
 
@@ -105,6 +112,7 @@
     <td width="20%" class="text-left valign-middle" data-bind="text: lookupActionstatusValue(ActionTypeKey)"></td>
     @*<td width="20%" class="text-left valign-middle"><button type="button" data-bind="text: lookupActionstatusValue(ActionTypeKey), click: updateStatus" class="btn btn-danger btn-sm">Add</button></td>*@
     <td width="40%" class="text-left valign-middle" data-bind="text: ScheduledEndDate.formatDate(DateFormat)"></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
     <td width="5%" class="text-center valign-middle" nowrap>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.removePageRecord, enable: $parent.canDelete() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-remove"></span></button>
@@ -120,11 +128,32 @@
         @Html.Raw(dataContext.AddTextAreaField<ActionItem>("Details"))
         @Html.Raw(dataContext.AddDateField<ActionItem>("ScheduledEndDate"))
     </div>
+    <div class="row" data-bind="visible: $parent.recordMode()==RecordMode.AddNew">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="uploadFiles">Add Action Related Documents:</label>
+                <input id="uploadFiles" name="uploadFiles[]" type="file" multiple class="file-loading">
+            </div>
+        </div>
+    </div>
+
 }
 @Html.Partial("PagedViewModel")
+<div id="manageDocumentsDialog" class="modal modal-wide fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <iframe style="border: none" id="manageDocumentsFrame"></iframe>
+                <button type="button" class="btn btn-default pull-right popup-ok-button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @section Scripts {
+@Scripts.Render("~/js.bundle/fileinput")
     <script>
         "use strict";
         @Html.Raw(Model.RenderViewModelConfiguration<ActionItem>(ViewBag, "ScheduledEndDate", planID))
@@ -193,15 +222,91 @@
 
             return undefined;
         }
+        
+        const fileUploadUrl = "@Html.Raw(Url.Content("~/FileUploadHandler.ashx?SourceTable=ActionItemDocument&SourceField=ActionItemID"))";
+        var selectedFiles;
+        
 
-        //$('#updateModal').on('show.bs.modal', function() {
-            
-        //});
-        //$('#updateModal').on('hide.bs.modal', function (event, observableRecord) {
-        //    $('#updateSelect').off('click');
-        //    viewModel.queryPageRecords();
-        //    // Clear frame page
-        //    $("#editActionItemFrame").attr("src", "about:blank");
-        //});
+        $(viewModel).on("beforeSave", function (event, observableRecord) {
+            selectedFiles = $("#uploadFiles").fileinput("getFileStack");
+        });
+
+        $(viewModel).on("recordSaved", function (event, record, newRecord) {
+            if (newRecord && selectedFiles.length > 0 && viewModel.dataHubIsConnected()) {
+                dataHub.getLastActionItemID().done(function (actionID) {
+                    $("#uploadFiles").fileinput({
+                        uploadUrl: fileUploadUrl + "&SourceID=" + actionID.toString(),
+                        uploadAsync: true
+                    });
+
+                    for (var i = 0; i < selectedFiles.length; i++) {
+                        $("#uploadFiles").fileinput("addToStack", selectedFiles[i]);
+                    }
+
+                    $("#uploadFiles").fileinput("upload");
+                });
+            }
+        });
+
+        
+        function getDocumentCount(sourceID, element) {
+            if (viewModel.dataHubIsConnected()) {
+                dataHub.queryDocumentDetailCount("ActionItem", sourceID, null).done(function(count) {
+                    $("#documentCount" + sourceID).text(count.toString());
+                });
+            }
+
+            return element.text();
+        }
+
+        $(window).resize(function() {
+            setTimeout(function() {
+                $("#manageDocumentsFrame").attr("height", ($(document).height() - 150) + "px");
+            }, 500);
+        });
+
+        function openManageDocumentsDialog(record) {
+            const count = parseInt(notNull($("#documentCount" + record.ID).text(), 0));
+            var initialMode = "";
+
+            //if (count < 1)
+            //    initialMode = "/AddNew";
+
+           
+            $("#manageDocumentsFrame")
+                .attr({
+                    "src": "@Url.Content("~/Main/Documents")" + initialMode + "?SourceTable=ActionItem&SourceField=ActionItemID&SourceID=" + record.ID + "&Name=" + encodeURIComponent(record.Title) + "&HideButton=" + ("@hideButton").toLowerCase(),
+                    "height": ($(document).height() - 150 ) + "px",
+                    "width": "100%"
+        });
+
+        $("#manageDocumentsDialog").modal("show");
+        }
+
+        $("#manageDocumentsDialog").on("hidden.bs.modal", function() {
+            // Refresh page counts after editing tasks
+            viewModel.queryPageRecords();
+
+            // Clear frame page
+            $("#manageDocumentsFrame").attr("src", "about:blank");
+        });
+
+        $(function () {
+            $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });
+            $("#addNewEditDialog").on("shown.bs.modal", function () {
+                $("#uploadFiles").fileinput({
+                    uploadUrl: fileUploadUrl,
+                    uploadAsync: true,
+                    showUpload: false,
+                    showRemove: true,
+                    showPreview: false,
+                    minFileCount: 1,
+                    maxFileCount: 12
+                });
+
+            });
+
+        });
+
     </script>
 }
