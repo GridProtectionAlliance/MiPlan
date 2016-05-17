@@ -161,6 +161,12 @@ namespace MiPlan.Controllers
             return View();
         }
 
+        public ActionResult Documents()
+        {
+            m_appModel.ConfigureView<DocumentDetail>(Url.RequestContext, "Documents", ViewBag);
+            return View();
+        }
+
         public ActionResult PageTemplate1()
         {
             m_appModel.ConfigureView(Url.RequestContext, "PageTemplate1", ViewBag);
@@ -181,14 +187,14 @@ namespace MiPlan.Controllers
 
         public ActionResult History()
         {
-            m_appModel.ConfigureView<CompletedMitigationPlan>(Url.RequestContext, "History", ViewBag);
+            m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "History", ViewBag);
             return View();
         }
 
         public ActionResult MitigationPlan()
         {
             int themeID = 13;
-            m_appModel.ConfigureView<UncompletedMitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
+            m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
             ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));

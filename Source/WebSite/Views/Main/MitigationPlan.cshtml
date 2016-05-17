@@ -25,6 +25,10 @@
 @using GSF
 @using GSF.Web.Model
 @model AppModel
+@section StyleSheets {
+    @Styles.Render("~/css.bundle/fileinput")
+}
+
 @{
     DataContext dataContext = Model.DataContext;
     string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
@@ -111,7 +115,8 @@
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
         new[] { "Field1", "Title", "text-left"},
         new[] { null, "Actions", "text-center valign-middle" },
-        new[] { null, "Tracking", "text-center valign-middle" }
+        new[] { null, "Tracking", "text-center valign-middle" },
+        new[] { null, "Documents", "text-center valign-middle" }
 
     };
 
@@ -124,10 +129,11 @@
 {
         <td width="5%" class="text-center valign-middle"><img src="~/Images/StatusLights/Small/greenlight.png" alt="OK" title="OK" data-bind="attr: {'update-attr': getStatusImage($($element), $data)}"></td>
         <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
-        <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
+        <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupAbbreviationValue(BusinessUnitID)"></div></td>
         <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
         <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
         <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openStartTracking.bind($data), visible: getActionStatusKey($data, $($element))" class="btn btn-danger btn-sm">Start</button></td>
+        <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
         <td width="5%" class="text-center valign-middle" nowrap>
             <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
             <button type="button" class="btn btn-xs" data-bind="click: $parent.removePageRecord, enable: $parent.canDelete() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-remove"></span></button>
@@ -139,16 +145,26 @@
 
     <div class="col-md-12">
 
-        @Html.Raw(dataContext.AddInputField<UncompletedMitigationPlan>("Title"))
-        @Html.Raw(dataContext.AddSelectField<UncompletedMitigationPlan, BusinessUnit>("BusinessUnitID", "ID", "Name"))
+        @Html.Raw(dataContext.AddInputField<MitigationPlan>("Title"))
+        @Html.Raw(dataContext.AddSelectField<MitigationPlan, BusinessUnit>("BusinessUnitID", "ID", "Name"))
         @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
         {
 
-            @Html.Raw(dataContext.AddTextAreaField<UncompletedMitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
         }
-        @Html.Raw(dataContext.AddTextAreaField<UncompletedMitigationPlan>("Description"))
-        @Html.Raw(dataContext.AddTextAreaField<UncompletedMitigationPlan>("StatusNotes"))
+        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
+        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
     </div>
+
+    <div class="row" data-bind="visible: $parent.recordMode()==RecordMode.AddNew">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="uploadFiles">Add Plan Related Documents:</label>
+                <input id="uploadFiles" name="uploadFiles[]" type="file" multiple class="file-loading">
+            </div>
+        </div>
+    </div>
+
 }
 @Html.Partial("PagedViewModel")
 
@@ -164,10 +180,24 @@
     </div>
 </div>
 
+<div id="manageDocumentsDialog" class="modal modal-wide fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <iframe style="border: none" id="manageDocumentsFrame"></iframe>
+                <button type="button" class="btn btn-default pull-right popup-ok-button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
+@Scripts.Render("~/js.bundle/fileinput")
     <script>
-        @Html.Raw(Model.RenderViewModelConfiguration<UncompletedMitigationPlan>(ViewBag))
-        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+        @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlan>(ViewBag, "ID", "false"))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation"))
 
 
         function getStatusImage(element, record) {
@@ -241,9 +271,10 @@
                 dataHub.queryActionItems(record.ID).done(function(data) {
                     data.forEach(function(i) {
                         //console.log(i);
-                        ++i.ActionTypeKey;
+                        if(i.ActionTypeKey == 1)
+                            ++i.ActionTypeKey;
                         dataHub.updateActionItem(i).done(function() {
-                            $(window).trigger("updatePage");
+                            viewModel.queryPageRecords();
                         });
                     });
 
@@ -331,13 +362,89 @@
             // Clear frame page
             $("#editActionItemFrame").attr("src", "about:blank");
         });
+        
+        const fileUploadUrl = "@Html.Raw(Url.Content("~/FileUploadHandler.ashx?SourceTable=MitigationPlanDocument&SourceField=MitigationPlanID"))";
+        var selectedFiles;
+        
+
+        $(viewModel).on("beforeSave", function (event, observableRecord) {
+            selectedFiles = $("#uploadFiles").fileinput("getFileStack");
+        });
+
+        $(viewModel).on("recordSaved", function (event, record, newRecord) {
+            if (newRecord && selectedFiles.length > 0 && viewModel.dataHubIsConnected()) {
+                dataHub.getLastMitigationPlanID().done(function (planID) {
+                    $("#uploadFiles").fileinput({
+                        uploadUrl: fileUploadUrl + "&SourceID=" + planID.toString(),
+                        uploadAsync: true
+                    });
+
+                    for (var i = 0; i < selectedFiles.length; i++) {
+                        $("#uploadFiles").fileinput("addToStack", selectedFiles[i]);
+                    }
+
+                    $("#uploadFiles").fileinput("upload");
+                });
+            }
+        });
+        
+        function getDocumentCount(sourceID, element) {
+            if (viewModel.dataHubIsConnected()) {
+                dataHub.queryDocumentDetailCount("MitigationPlan", sourceID, null).done(function(count) {
+                    $("#documentCount" + sourceID).text(count.toString());
+                });
+            }
+
+            return element.text();
+        }
+
+        $(window).resize(function() {
+            setTimeout(function() {
+                $("#manageDocumentsFrame").attr("height", ($(document).height() - 150) + "px");
+            }, 500);
+        });
+
+        function openManageDocumentsDialog(record) {
+            const count = parseInt(notNull($("#documentCount" + record.ID).text(), 0));
+            var initialMode = "";
+
+            if (count < 1)
+                initialMode = "/AddNew";
+
+            $("#manageDocumentsFrame")
+                .attr({
+                    "src": "@Url.Content("~/Main/Documents")" + initialMode + "?SourceTable=MitigationPlan&SourceField=MitigationPlanID&SourceID=" + record.ID + "&Name=" + encodeURIComponent(record.Title),
+                    "height": ($(document).height() - 150) + "px",
+                    "width": "100%"
+        });
+
+        $("#manageDocumentsDialog").modal("show");
+        }
+
+        $("#manageDocumentsDialog").on("hidden.bs.modal", function() {
+            // Refresh page counts after editing tasks
+            viewModel.queryPageRecords();
+
+            // Clear frame page
+            $("#manageDocumentsFrame").attr("src", "about:blank");
+        });
 
         $(function () {
-            $(window).on("updatePage", function() {
-                viewModel.queryPageRecords();
-            });
+            $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });
 
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
+            $("#addNewEditDialog").on("shown.bs.modal", function () {
+                $("#uploadFiles").fileinput({
+                    uploadUrl: fileUploadUrl,
+                    uploadAsync: true,
+                    showUpload: false,
+                    showRemove: true,
+                    showPreview: false,
+                    minFileCount: 1,
+                    maxFileCount: 12
+                });
+
+            });
         });
     </script>
 }

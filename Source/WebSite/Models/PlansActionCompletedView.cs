@@ -7,12 +7,8 @@ using GSF.Data.Model;
 namespace MiPlan.Models
 {
     [System.Web.DynamicData.TableName("PlansActionCompletedView")]
-    public class PlansActionCompletedView
+    public class PlansActionCompletedView: MitigationPlan
     {
-        [PrimaryKey(true)]
-        public int ID { get; set; }
-        public int BusinessUnitID { get; set; }
-        public string Title { get; set; }
-        public string Field1 { get; set; }
+
     }
 }

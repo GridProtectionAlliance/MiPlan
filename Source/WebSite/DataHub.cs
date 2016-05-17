@@ -130,6 +130,13 @@ namespace MiPlan
         private static readonly ThreadLocal<string> s_connectionID = new ThreadLocal<string>();
         private static readonly RecordOperationsCache s_recordOperationsCache;
 
+        /// <summary>
+        /// Gets statically cached instance of <see cref="RecordOperationsCache"/> for <see cref="DataHub"/> instances.
+        /// </summary>
+        /// <returns>Statically cached instance of <see cref="RecordOperationsCache"/> for <see cref="DataHub"/> instances.</returns>
+        public static RecordOperationsCache GetRecordOperationsCache() => s_recordOperationsCache;
+
+
         // Static Constructor
         static DataHub()
         {
@@ -141,81 +148,32 @@ namespace MiPlan
 
         // Client-side script functionality
 
-        #region [ Patch Table Operations ]
-
-        [RecordOperation(typeof(Patch), RecordOperation.QueryRecordCount)]
-        public int QueryPatchCount(bool showDeleted)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<Patch>().QueryRecordCount();
-
-            return m_dataContext.Table<Patch>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [RecordOperation(typeof(Patch), RecordOperation.QueryRecords)]
-        public IEnumerable<Patch> QueryPatches(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<Patch>().QueryRecords(sortField, ascending, page, pageSize);
-
-            return m_dataContext.Table<Patch>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Patch), RecordOperation.DeleteRecord)]
-        public void DeletePatch(int id)
-        {
-            // For Patches, we only "mark" a record as deleted
-            m_dataContext.Connection.ExecuteNonQuery("UPDATE Patch SET IsDeleted=1 WHERE ID={0}", id);
-        }
-
-        [RecordOperation(typeof(Patch), RecordOperation.CreateNewRecord)]
-        public Patch NewPatch()
-        {
-            return new Patch();
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(Patch), RecordOperation.AddNewRecord)]
-        public void AddNewPatch(Patch record)
-        {
-            record.CreatedByID = GetCurrentUserID();
-            record.CreatedOn = DateTime.UtcNow;
-            record.UpdatedByID = record.CreatedByID;
-            record.UpdatedOn = record.CreatedOn;
-            m_dataContext.Table<Patch>().AddNewRecord(record);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(Patch), RecordOperation.UpdateRecord)]
-        public void UpdatePatch(Patch record)
-        {
-            record.UpdatedByID = GetCurrentUserID();
-            record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<Patch>().UpdateRecord(record);
-        }
-
-        #endregion
-
         #region [ MitigationPlan Table Operations ]
 
         [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecordCount)]
-        public int QueryMitigationPlanCount(bool showDeleted)
+        public int QueryMitigationPlanCount(bool showDeleted, bool isCompleted, string filterText)
         {
             if (showDeleted)
-                return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction());
+                return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = {0}", isCompleted));
 
-            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
+            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0}", isCompleted));
         }
 
         [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecords)]
-        public IEnumerable<MitigationPlan> QueryMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<MitigationPlan> QueryMitigationPlanes(bool showDeleted, bool isCompleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             if (showDeleted)
-                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
+                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = {0}", isCompleted));
 
-            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0}", isCompleted));
         }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        public int GetLastMitigationPlanID()
+        {
+            return m_dataContext.Connection.ExecuteScalar<int?>("SELECT IDENT_CURRENT('MitigationPlan')") ?? 0;
+        }
+
 
         [AuthorizeHubRole("Administrator, Owner")]
         [RecordOperation(typeof(MitigationPlan), RecordOperation.DeleteRecord)]
@@ -231,7 +189,7 @@ namespace MiPlan
             return new MitigationPlan();
         }
 
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [AuthorizeHubRole("Administrator, Owner, Editor")]
         [RecordOperation(typeof(MitigationPlan), RecordOperation.AddNewRecord)]
         public void AddNewMitigationPlan(MitigationPlan record)
         {
@@ -243,7 +201,7 @@ namespace MiPlan
             m_dataContext.Table<MitigationPlan>().AddNewRecord(record);
         }
 
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [AuthorizeHubRole("Administrator, Owner")]
         [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
         public void UpdateMitigationPlan(MitigationPlan record)
         {
@@ -252,7 +210,7 @@ namespace MiPlan
             m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
         }
 
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
+        [AuthorizeHubRole("Administrator, Owner")]
         [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
         public void CompleteMitigationPlan(MitigationPlan record)
         {
@@ -264,118 +222,12 @@ namespace MiPlan
 
         #endregion
 
-        #region [ CompletedMitigationPlan Table Operations ]
-
-        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.QueryRecordCount)]
-        public int QueryCompletedMitigationPlanCount(bool showDeleted)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<CompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = 1"));
-
-            return m_dataContext.Table<CompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1") );
-        }
-
-        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.QueryRecords)]
-        public IEnumerable<CompletedMitigationPlan> QueryCompletedMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<CompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
-
-            return m_dataContext.Table<CompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 1"));
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.DeleteRecord)]
-        public void DeleteCompletedMitigationPlan(int id)
-        {
-            // For MitigationPlanes, we only "mark" a record as deleted
-            m_dataContext.Connection.ExecuteNonQuery("UPDATE CompletedMitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(CompletedMitigationPlan), RecordOperation.UpdateRecord)]
-        public void UpdateCompletedMitigationPlan(CompletedMitigationPlan record)
-        {
-            record.UpdatedByID = GetCurrentUserID();
-            record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<CompletedMitigationPlan>().UpdateRecord(record);
-        }
-
-        #endregion
-
-        #region [ UncompletedMitigationPlan Table Operations ]
-
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.QueryRecordCount)]
-        public int QueryUncompletedMitigationPlanCount(bool showDeleted)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = 0"));
-
-            return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0"));
-        }
-
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.QueryRecords)]
-        public IEnumerable<UncompletedMitigationPlan> QueryUncompletedMitigationPlanes(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize);
-
-            return m_dataContext.Table<UncompletedMitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0"));
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.DeleteRecord)]
-        public void DeleteUncompletedMitigationPlan(int id)
-        {
-            // For MitigationPlanes, we only "mark" a record as deleted
-            m_dataContext.Connection.ExecuteNonQuery("UPDATE MitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
-        }
-
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.CreateNewRecord)]
-        public UncompletedMitigationPlan NewUncompeletedMitigationPlan()
-        {
-            return new UncompletedMitigationPlan();
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.AddNewRecord)]
-        public void AddNewUncompletedMitigationPlan(UncompletedMitigationPlan record)
-        {
-            record.CreatedByID = GetCurrentUserID();
-            record.CreatedOn = DateTime.UtcNow;
-            record.UpdatedByID = record.CreatedByID;
-            record.UpdatedOn = record.CreatedOn;
-            record.IsCompleted = false;
-            m_dataContext.Table<UncompletedMitigationPlan>().AddNewRecord(record);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.UpdateRecord)]
-        public void UpdateUncompletedMitigationPlan(UncompletedMitigationPlan record)
-        {
-            record.UpdatedByID = GetCurrentUserID();
-            record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<UncompletedMitigationPlan>().UpdateRecord(record);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(UncompletedMitigationPlan), RecordOperation.UpdateRecord)]
-        public void CompleteUncompletedMitigationPlan(UncompletedMitigationPlan record)
-        {
-            record.UpdatedByID = GetCurrentUserID();
-            record.UpdatedOn = DateTime.UtcNow;
-            record.IsCompleted = true;
-            m_dataContext.Table<UncompletedMitigationPlan>().UpdateRecord(record);
-        }
-
-        #endregion
-
         #region [ ActionItem Table Operations ]
 
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ActionItem), RecordOperation.QueryRecordCount)]
-        public int QueryActionItemCount(int parentID)
+        public int QueryActionItemCount(int parentID, string filterText)
         {
             return m_dataContext.Table<ActionItem>().QueryRecordCount(new RecordRestriction("PlanID = {0}", parentID));
         }
@@ -388,7 +240,7 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ActionItem), RecordOperation.QueryRecords)]
-        public IEnumerable<ActionItem> QueryActionItems(int parentID, string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<ActionItem> QueryActionItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<ActionItem>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("PlanID = {0}", parentID));
         }
@@ -436,7 +288,7 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(NoticeLog), RecordOperation.QueryRecordCount)]
-        public int QueryNoticeLogCount()
+        public int QueryNoticeLogCount(string filterText)
         {
             return m_dataContext.Table<NoticeLog>().QueryRecordCount();
         }
@@ -449,7 +301,7 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(NoticeLog), RecordOperation.QueryRecords)]
-        public IEnumerable<NoticeLog> QueryNoticeLogs(string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<NoticeLog> QueryNoticeLogs(string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<NoticeLog>().QueryRecords(sortField, ascending, page, pageSize);
         }
@@ -478,122 +330,10 @@ namespace MiPlan
 
         #endregion
 
-        #region [ Vendor Table Operations ]
-
-        [RecordOperation(typeof(Vendor), RecordOperation.QueryRecordCount)]
-        public int QueryVendorCount(bool showDeleted)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<Vendor>().QueryRecordCount();
-
-            return m_dataContext.Table<Vendor>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [RecordOperation(typeof(Vendor), RecordOperation.QueryRecords)]
-        public IEnumerable<Vendor> QueryVendors(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<Vendor>().QueryRecords(sortField, ascending, page, pageSize);
-
-            return m_dataContext.Table<Vendor>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Vendor), RecordOperation.DeleteRecord)]
-        public void DeleteVendor(int id)
-        {
-            // For Vendors, we only "mark" a record as deleted
-            m_dataContext.Connection.ExecuteNonQuery("UPDATE Vendor SET IsDeleted=1 WHERE ID={0}", id);
-        }
-
-        [RecordOperation(typeof(Vendor), RecordOperation.CreateNewRecord)]
-        public Vendor NewVendor()
-        {
-            return new Vendor();
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Vendor), RecordOperation.AddNewRecord)]
-        public void AddNewVendor(Vendor record)
-        {
-            record.CreatedByID = GetCurrentUserID();
-            record.CreatedOn = DateTime.UtcNow;
-            record.UpdatedByID = record.CreatedByID;
-            record.UpdatedOn = record.CreatedOn;
-            m_dataContext.Table<Vendor>().AddNewRecord(record);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Vendor), RecordOperation.UpdateRecord)]
-        public void UpdateVendor(Vendor record)
-        {
-            record.UpdatedByID = GetCurrentUserID();
-            record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<Vendor>().UpdateRecord(record);
-        }
-
-        #endregion
-
-        #region [ Platform Table Operations ]
-
-        [RecordOperation(typeof(Platform), RecordOperation.QueryRecordCount)]
-        public int QueryPlatformCount(bool showDeleted)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<Platform>().QueryRecordCount();
-
-            return m_dataContext.Table<Platform>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [RecordOperation(typeof(Platform), RecordOperation.QueryRecords)]
-        public IEnumerable<Platform> QueryPlatforms(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<Platform>().QueryRecords(sortField, ascending, page, pageSize);
-
-            return m_dataContext.Table<Platform>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Platform), RecordOperation.DeleteRecord)]
-        public void DeletePlatform(int id)
-        {
-            // For Platforms, we only "mark" a record as deleted
-            m_dataContext.Connection.ExecuteNonQuery("UPDATE Platform SET IsDeleted=1 WHERE ID={0}", id);
-        }
-
-        [RecordOperation(typeof(Platform), RecordOperation.CreateNewRecord)]
-        public Platform NewPlatform()
-        {
-            return new Platform();
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Platform), RecordOperation.AddNewRecord)]
-        public void AddNewPlatform(Platform record)
-        {
-            record.CreatedByID = GetCurrentUserID();
-            record.CreatedOn = DateTime.UtcNow;
-            record.UpdatedByID = record.CreatedByID;
-            record.UpdatedOn = record.CreatedOn;
-            m_dataContext.Table<Platform>().AddNewRecord(record);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(Platform), RecordOperation.UpdateRecord)]
-        public void UpdatePlatform(Platform record)
-        {
-            record.UpdatedByID = GetCurrentUserID();
-            record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<Platform>().UpdateRecord(record);
-        }
-
-        #endregion
-
         #region [ BusinessUnitGroup Table Operations ]
 
         [RecordOperation(typeof(BusinessUnit), RecordOperation.QueryRecordCount)]
-        public int QueryBusinessUnitGroupCount(bool showDeleted)
+        public int QueryBusinessUnitGroupCount(bool showDeleted, string filterText)
         {
             if (showDeleted)
                 return m_dataContext.Table<BusinessUnit>().QueryRecordCount();
@@ -602,7 +342,7 @@ namespace MiPlan
         }
 
         [RecordOperation(typeof(BusinessUnit), RecordOperation.QueryRecords)]
-        public IEnumerable<BusinessUnit> QueryBusinessUnitGroups(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<BusinessUnit> QueryBusinessUnitGroups(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             if (showDeleted)
                 return m_dataContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize);
@@ -650,14 +390,14 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(Page), RecordOperation.QueryRecordCount)]
-        public int QueryPageCount()
+        public int QueryPageCount(string filterText)
         {
             return m_dataContext.Table<Page>().QueryRecordCount();
         }
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(Page), RecordOperation.QueryRecords)]
-        public IEnumerable<Page> QueryPages(string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<Page> QueryPages(string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<Page>().QueryRecords(sortField, ascending, page, pageSize);
         }
@@ -697,14 +437,14 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(Menu), RecordOperation.QueryRecordCount)]
-        public int QueryMenuCount()
+        public int QueryMenuCount(string filterText)
         {
             return m_dataContext.Table<Menu>().QueryRecordCount();
         }
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(Menu), RecordOperation.QueryRecords)]
-        public IEnumerable<Menu> QueryMenus(string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<Menu> QueryMenus(string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<Menu>().QueryRecords(sortField, ascending, page, pageSize);
         }
@@ -744,14 +484,14 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(MenuItem), RecordOperation.QueryRecordCount)]
-        public int QueryMenuItemCount(int parentID)
+        public int QueryMenuItemCount(int parentID, string filterText)
         {
             return m_dataContext.Table<MenuItem>().QueryRecordCount(new RecordRestriction("MenuID = {0}", parentID));
         }
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(MenuItem), RecordOperation.QueryRecords)]
-        public IEnumerable<MenuItem> QueryMenuItems(int parentID, string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<MenuItem> QueryMenuItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<MenuItem>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("MenuID = {0}", parentID));
         }
@@ -798,14 +538,14 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ValueListGroup), RecordOperation.QueryRecordCount)]
-        public int QueryValueListGroupCount()
+        public int QueryValueListGroupCount(string filterText)
         {
             return m_dataContext.Table<ValueListGroup>().QueryRecordCount();
         }
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ValueListGroup), RecordOperation.QueryRecords)]
-        public IEnumerable<ValueListGroup> QueryValueListGroups(string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<ValueListGroup> QueryValueListGroups(string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<ValueListGroup>().QueryRecords(sortField, ascending, page, pageSize);
         }
@@ -846,14 +586,14 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ValueList), RecordOperation.QueryRecordCount)]
-        public int QueryValueListCount(int parentID)
+        public int QueryValueListCount(int parentID, string filterText)
         {
             return m_dataContext.Table<ValueList>().QueryRecordCount(new RecordRestriction("GroupID = {0}", parentID));
         }
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ValueList), RecordOperation.QueryRecords)]
-        public IEnumerable<ValueList> QueryValueListItems(int parentID, string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<ValueList> QueryValueListItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<ValueList>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("GroupID = {0}", parentID));
         }
@@ -894,14 +634,14 @@ namespace MiPlan
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecordCount)]
-        public int QueryThemeFieldsCount(int parentID)
+        public int QueryThemeFieldsCount(int parentID, string filterText)
         {
             return m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("GroupID = {0}", parentID));
         }
 
         [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecords)]
-        public IEnumerable<ThemeFields> QueryThemeFieldsItems(int parentID, string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<ThemeFields> QueryThemeFieldsItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<ThemeFields>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("GroupID = {0}", parentID));
         }
@@ -917,83 +657,16 @@ namespace MiPlan
 
         #endregion
 
-        #region [ LatestVendorDiscoveryResult View Operations ]
-
-        [RecordOperation(typeof(LatestVendorDiscoveryResult), RecordOperation.QueryRecordCount)]
-        public int QueryLatestVendorDiscoveryResultCount(bool showDeleted)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<LatestVendorDiscoveryResult>().QueryRecordCount();
-
-            return m_dataContext.Table<LatestVendorDiscoveryResult>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [RecordOperation(typeof(LatestVendorDiscoveryResult), RecordOperation.QueryRecords)]
-        public IEnumerable<LatestVendorDiscoveryResult> QueryLatestVendorDiscoveryResults(bool showDeleted, string sortField, bool ascending, int page, int pageSize)
-        {
-            if (showDeleted)
-                return m_dataContext.Table<LatestVendorDiscoveryResult>().QueryRecords(sortField, ascending, page, pageSize);
-
-            return m_dataContext.Table<LatestVendorDiscoveryResult>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
-        }
-
-        [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(LatestVendorDiscoveryResult), RecordOperation.DeleteRecord)]
-        public void DeleteLatestVendorDiscoveryResult(int id)
-        {
-            // Delete associated DiscoveryResult record
-            m_dataContext.Table<DiscoveryResult>().DeleteRecord(id);
-        }
-
-        [RecordOperation(typeof(LatestVendorDiscoveryResult), RecordOperation.CreateNewRecord)]
-        public LatestVendorDiscoveryResult NewLatestVendorDiscoveryResult()
-        {
-            return new LatestVendorDiscoveryResult();
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(LatestVendorDiscoveryResult), RecordOperation.AddNewRecord)]
-        public void AddNewLatestVendorDiscoveryResult(LatestVendorDiscoveryResult record)
-        {
-            DiscoveryResult result = DeriveDiscoveryResult(record);
-            result.CreatedByID = GetCurrentUserID();
-            result.CreatedOn = DateTime.UtcNow;
-            m_dataContext.Table<DiscoveryResult>().AddNewRecord(result);
-        }
-
-        [AuthorizeHubRole("Administrator, Owner, PIC")]
-        [RecordOperation(typeof(LatestVendorDiscoveryResult), RecordOperation.UpdateRecord)]
-        public void UpdateLatestVendorDiscoveryResult(LatestVendorDiscoveryResult record)
-        {
-            m_dataContext.Table<DiscoveryResult>().UpdateRecord(DeriveDiscoveryResult(record));
-        }
-
-        private DiscoveryResult DeriveDiscoveryResult(LatestVendorDiscoveryResult record)
-        {
-            return new DiscoveryResult
-            {
-                ID = record.DiscoveryResultID,
-                VendorID = record.VendorID,
-                ReviewDate = record.ReviewDate,
-                ResultKey = record.ResultKey,
-                Notes = record.Notes,
-                CreatedByID = record.CreatedByID,
-                CreatedOn =  record.CreatedOn
-            };
-        }
-
-        #endregion
-
         #region [ MitigationPlanActionItemsCompleted View Operations ]
 
         [RecordOperation(typeof(MitigationPlanActionItemsCompleted), RecordOperation.QueryRecordCount)]
-        public int QueryMitigationPlanActionItemsCompletedCount()
+        public int QueryMitigationPlanActionItemsCompletedCount(string filterText)
         {
             return m_dataContext.Table<MitigationPlanActionItemsCompleted>().QueryRecordCount();
         }
 
         [RecordOperation(typeof(MitigationPlanActionItemsCompleted), RecordOperation.QueryRecords)]
-        public IEnumerable<MitigationPlanActionItemsCompleted> QueryMitigationPlanActionItemsCompleteds(string res)
+        public IEnumerable<MitigationPlanActionItemsCompleted> QueryMitigationPlanActionItemsCompleteds(string res, string filterText)
         {
             return m_dataContext.Table<MitigationPlanActionItemsCompleted>().QueryRecords(restriction: new RecordRestriction(res));
         }
@@ -1011,13 +684,13 @@ namespace MiPlan
         #region [ PlansActionCompletedView View Operations ]
 
         [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.QueryRecordCount)]
-        public int QueryPlansActionCompletedViewCount()
+        public int QueryPlansActionCompletedViewCount(bool isDeleted, string filterText)
         {
             return m_dataContext.Table<PlansActionCompletedView>().QueryRecordCount();
         }
 
         [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.QueryRecords)]
-        public IEnumerable<PlansActionCompletedView> QueryPlansActionCompletedViews(string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<PlansActionCompletedView> QueryPlansActionCompletedViews(bool isDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<PlansActionCompletedView>().QueryRecords(sortField, ascending, page, pageSize);
         }
@@ -1035,13 +708,13 @@ namespace MiPlan
         #region [ MitigationPlanActionItemsView View Operations ]
 
         [RecordOperation(typeof(MitigationPlanActionItemsView), RecordOperation.QueryRecordCount)]
-        public int QueryMitigationPlanActionItemsViewCount()
+        public int QueryMitigationPlanActionItemsViewCount(string filterText)
         {
             return m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecordCount();
         }
 
         [RecordOperation(typeof(MitigationPlanActionItemsView), RecordOperation.QueryRecords)]
-        public IEnumerable<MitigationPlanActionItemsView> QueryMitigationPlanActionItemsViews(string sortField, bool ascending, int page, int pageSize)
+        public IEnumerable<MitigationPlanActionItemsView> QueryMitigationPlanActionItemsViews(string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             return m_dataContext.Table<MitigationPlanActionItemsView>().QueryRecords(sortField, ascending, page, pageSize);
         }
@@ -1055,6 +728,116 @@ namespace MiPlan
 
 
         #endregion
+
+        #region [ Document Table Operations ]
+
+        [RecordOperation(typeof(Document), RecordOperation.QueryRecordCount)]
+        public int QueryDocumentCount(string filterText = "%")
+        {
+            return m_dataContext.Table<Document>().QueryRecordCount();
+        }
+
+        //[RecordOperation(typeof(Document), RecordOperation.QueryRecords)]
+        //public IEnumerable<Document> QueryDocuments(int sourceID, string sourceField, string tableName)
+        //{
+        //    IEnumerable<int> documentIDs =
+        //        m_dataContext.Connection.RetrieveData($"SELECT DocumentID FROM {tableName} WHERE {sourceField} = {{0}}", sourceID)
+        //            .AsEnumerable()
+        //            .Select(row => row.ConvertField<int>("DocumentID", 0));            
+
+        //    return m_dataContext.Table<Document>().QueryRecords("Filename", new RecordRestriction($"ID IN ({string.Join(", ", documentIDs)})"));
+        //}
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(Document), RecordOperation.DeleteRecord)]
+        public void DeleteDocument(int id, string filterText = "%")
+        {
+            m_dataContext.Table<Document>().DeleteRecord(id);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(Document), RecordOperation.CreateNewRecord)]
+        public Document NewDocument()
+        {
+            return new Document();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(Document), RecordOperation.AddNewRecord)]
+        public void AddNewDocument(Document record)
+        {
+            record.CreatedOn = DateTime.UtcNow;
+            m_dataContext.Table<Document>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(Document), RecordOperation.UpdateRecord)]
+        public void UpdateDocument(Document record)
+        {
+            m_dataContext.Table<Document>().UpdateRecord(record);
+        }
+
+        #endregion
+
+        #region [ DocumentDetail View Operations ]
+
+        [RecordOperation(typeof(DocumentDetail), RecordOperation.QueryRecordCount)]
+        public int QueryDocumentDetailCount(string sourceTable, int sourceID, string filterText)
+        {
+            return m_dataContext.Table<DocumentDetail>().QueryRecordCount(new RecordRestriction("SourceTable = {0} AND SourceID = {1}", sourceTable, sourceID));
+        }
+
+        [RecordOperation(typeof(DocumentDetail), RecordOperation.QueryRecords)]
+        public IEnumerable<DocumentDetail> QueryDocumentDetailResults(string sourceTable, int sourceID, string sortField, bool ascending, int page, int pageSize, string filterText)
+        {
+            return m_dataContext.Table<DocumentDetail>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("SourceTable = {0} AND SourceID = {1}", sourceTable, sourceID));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(DocumentDetail), RecordOperation.DeleteRecord)]
+        public void DeleteDocumentDetail(string sourceTable, int sourceID, int documentID)
+        {
+            m_dataContext.Connection.ExecuteNonQuery($"DELETE FROM {sourceTable}Document WHERE {sourceTable}ID = {{0}} AND DocumentID = {{1}}", sourceID, documentID);
+            m_dataContext.Table<Document>().DeleteRecord(documentID);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(DocumentDetail), RecordOperation.CreateNewRecord)]
+        public DocumentDetail NewDocumentDetail()
+        {
+            return new DocumentDetail();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(DocumentDetail), RecordOperation.AddNewRecord)]
+        public void AddNewDocumentDetail(DocumentDetail record)
+        {
+            // Stub function exists to assign rights to document related UI operations
+            throw new NotImplementedException();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC")]
+        [RecordOperation(typeof(DocumentDetail), RecordOperation.UpdateRecord)]
+        public void UpdateDocumentDetail(DocumentDetail record)
+        {
+            // Stub function exists to assign rights to document related UI operations
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region [ MitigationPlanDocument Table Operations ]
+
+        [AuthorizeHubRole("Administrator, Owner, PIC, SME, BUC, Viewer")]
+        [RecordOperation(typeof(MitigationPlanDocument), RecordOperation.UpdateRecord)]
+        public void UpdatePatchDocument(MitigationPlanDocument record)
+        {
+            // Stub function exists to assign rights to file upload operations
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
 
         #region [ Miscellaneous Hub Operations ]
 
@@ -1093,7 +876,7 @@ namespace MiPlan
         public Guid GetCurrentUserID()
         {
             Guid userID;
-            AuthorizationCache.UserIDs.TryGetValue(UserInfo.CurrentUserID, out userID);
+            AuthorizationCache.UserIDs.TryGetValue(Thread.CurrentPrincipal.Identity.Name, out userID);
             return userID;
         }
 

@@ -320,7 +320,7 @@ function PagedViewModel() {
             const promises = [];
 
             // Allow customization of observable record before conversion
-            $(self).trigger("derivingJSRecord", [observableRecord, promises]);
+            $(self).trigger("beforeSave", [observableRecord, promises]);
 
             $(promises).whenAll().done(function () {
                 deferred.resolve(ko.mapping.toJS(observableRecord));

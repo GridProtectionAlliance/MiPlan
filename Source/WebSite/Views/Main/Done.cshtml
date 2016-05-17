@@ -37,7 +37,9 @@
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
         new[] { "Field1", "Title", "text-left"},
         new[] { null, "Actions", "text-center valign-middle" },
-        new[] { null, "Close", "text-center valign-middle" }
+        new[] { null, "Close", "text-center valign-middle" },
+        new[] { null, "Documents", "text-center valign-middle" }
+
 
     };
 
@@ -47,11 +49,11 @@
 @helper BodyRows()
 {
     <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
-    <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
+    <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupAbbreviationValue(BusinessUnitID)"></div></td>
     <td width="60%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
-    <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
-    <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: closePlan.bind($data)" class="btn btn-danger btn-sm">Close</button></td>
-
+    <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: closePlan.bind($data)" class="btn btn-danger btn-sm">Close</button></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
 }
 @Html.Partial("PagedViewModel")
 
@@ -67,15 +69,29 @@
     </div>
 </div>
 
+<div id="manageDocumentsDialog" class="modal modal-wide fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <iframe style="border: none" id="manageDocumentsFrame"></iframe>
+                <button type="button" class="btn btn-default pull-right popup-ok-button" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<PlansActionCompletedView>(ViewBag))
-        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation"))
 
 
         function closePlan(record) {
-            dataHub.completeUncompletedMitigationPlan(record);
-            viewModel.queryPageRecords();
+            dataHub.completeMitigationPlan(record).done(function () {
+                viewModel.queryPageRecords();
+            });
+            
         }
 
         function openMenuItemEditor(record) {
@@ -96,9 +112,53 @@
             // Clear frame page
             $("#editActionItemFrame").attr("src", "about:blank");
         });
+        
+        function getDocumentCount(sourceID, element) {
+            if (viewModel.dataHubIsConnected()) {
+                dataHub.queryDocumentDetailCount("MitigationPlan", sourceID, null).done(function(count) {
+                    $("#documentCount" + sourceID).text(count.toString());
+                });
+            }
+
+            return element.text();
+        }
+
+        $(window).resize(function() {
+            setTimeout(function() {
+                $("#manageDocumentsFrame").attr("height", ($(document).height() - 150) + "px");
+            }, 500);
+        });
+
+        function openManageDocumentsDialog(record) {
+            const count = parseInt(notNull($("#documentCount" + record.ID).text(), 0));
+            var initialMode = "";
+
+            if (count < 1)
+                initialMode = "/AddNew";
+
+            $("#manageDocumentsFrame")
+                .attr({
+                    "src": "@Url.Content("~/Main/Documents")" + initialMode + "?SourceTable=MitigationPlan&SourceField=MitigationPlanID&SourceID=" + record.ID + "&Name=" + encodeURIComponent(record.Title),
+                    "height": ($(document).height() - 150) + "px",
+                    "width": "100%"
+        });
+
+        $("#manageDocumentsDialog").modal("show");
+        }
+
+        $("#manageDocumentsDialog").on("hidden.bs.modal", function() {
+            // Refresh page counts after editing tasks
+            viewModel.queryPageRecords();
+
+            // Clear frame page
+            $("#manageDocumentsFrame").attr("src", "about:blank");
+        });
+
 
         $(function () {
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
+            $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });
+
         });
     </script>
 }

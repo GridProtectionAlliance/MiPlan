@@ -48,20 +48,20 @@
       <HintPath>..\packages\ExpressionEvaluator.2.0.3.0\lib\net40\ExpressionEvaluator.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Core, Version=2.1.230.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Core.2.1.230-beta\lib\net46\GSF.Core.dll</HintPath>
+    <Reference Include="GSF.Core, Version=2.1.246.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Core.2.1.246-beta\lib\net46\GSF.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Security, Version=2.1.230.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Security.2.1.230-beta\lib\net46\GSF.Security.dll</HintPath>
+    <Reference Include="GSF.Security, Version=2.1.246.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Security.2.1.246-beta\lib\net46\GSF.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.ServiceModel, Version=2.1.230.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.ServiceModel.2.1.230-beta\lib\net46\GSF.ServiceModel.dll</HintPath>
+    <Reference Include="GSF.ServiceModel, Version=2.1.246.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.ServiceModel.2.1.246-beta\lib\net46\GSF.ServiceModel.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Web, Version=2.1.230.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Web.2.1.230-beta\lib\net46\GSF.Web.dll</HintPath>
+    <Reference Include="GSF.Web, Version=2.1.246.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Web.2.1.246-beta\lib\net46\GSF.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -195,6 +195,12 @@
     <Compile Include="Controllers\SecurityController.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
     <Compile Include="DataHub.cs" />
+    <Compile Include="FileDownloadHandler.ashx.cs">
+      <DependentUpon>FileDownloadHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="FileUploadHandler.ashx.cs">
+      <DependentUpon>FileUploadHandler.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -206,6 +212,7 @@
     <Compile Include="Models\CompletedMitigationPlan.cs" />
     <Compile Include="Models\DiscoveryResult.cs" />
     <Compile Include="Models\Document.cs" />
+    <Compile Include="Models\DocumentDetail.cs" />
     <Compile Include="Models\GlobalSettings.cs" />
     <Compile Include="Models\Install.cs" />
     <Compile Include="Models\InstallDocLink.cs" />
@@ -213,6 +220,7 @@
     <Compile Include="Models\MitigationPlan.cs" />
     <Compile Include="Models\MitigationPlanActionItemsCompleted.cs" />
     <Compile Include="Models\MitigationPlanActionItemsView.cs" />
+    <Compile Include="Models\MitigationPlanDocument.cs" />
     <Compile Include="Models\NoticeLog.cs" />
     <Compile Include="Models\NoticeUserLink.cs" />
     <Compile Include="Models\Page.cs" />
@@ -251,6 +259,7 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\fileinput.css" />
     <Content Include="Content\Popup.css" />
     <Content Include="Content\bootstrap-sidebar.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -343,9 +352,13 @@
     <Content Include="Docs\SPP12-006.pdf" />
     <Content Include="Docs\Test.pdf" />
     <Content Include="Docs\tva12_MP.pdf" />
+    <Content Include="FileDownloadHandler.ashx" />
+    <Content Include="FileUploadHandler.ashx" />
     <None Include="Properties\PublishProfiles\Deploy to GPAWEB.pubxml" />
     <None Include="Properties\PublishProfiles\Publish to GPAWEB.pubxml" />
     <None Include="Scripts\jquery-2.2.0.intellisense.js" />
+    <Content Include="Scripts\fileinput.js" />
+    <Content Include="Scripts\fileinput.min.js" />
     <Content Include="Scripts\gsf.web.client.js" />
     <Content Include="Scripts\ie10-viewport-bug-workaround.js" />
     <Content Include="Scripts\jquery-2.2.0.js" />
@@ -376,7 +389,9 @@
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\Site.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -400,12 +415,10 @@
     <Content Include="Views\Shared\SecurityError.cshtml" />
     <Content Include="Views\Shared\_ErrorLayout.cshtml" />
     <Content Include="Views\System\Menus.cshtml" />
-    <Content Include="Views\Settings\Vendors.cshtml" />
     <Content Include="Views\Security\Users.cshtml" />
     <Content Include="Views\Main\PageTemplate1.cshtml" />
     <Content Include="Views\Settings\Home.cshtml" />
     <Content Include="Views\Main\DisplayPDF.cshtml" />
-    <Content Include="Views\Settings\Platforms.cshtml" />
     <Content Include="Views\Settings\BusinessUnits.cshtml" />
     <Content Include="Views\Security\Groups.cshtml" />
     <Content Include="Views\Main\DiscoverPatches.cshtml" />
@@ -416,6 +429,7 @@
     <Content Include="Views\Main\MitigationPlan.cshtml" />
     <Content Include="Views\Main\ActionItem.cshtml" />
     <Content Include="Views\Main\PlanView.cshtml" />
+    <Content Include="Views\Main\Documents.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
