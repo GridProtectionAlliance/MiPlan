@@ -40,6 +40,12 @@ namespace MiPlan.Models
     /// </remarks>
     public class AppModel
     {
+        #region [ Members ]
+
+        // Fields
+        private DataContext m_buContext;
+
+        #endregion
         #region [ Constructors ]
 
         /// <summary>
@@ -57,6 +63,7 @@ namespace MiPlan.Models
         public AppModel(DataContext dataContext) : this()
         {
             DataContext = dataContext;
+
         }
 
         #endregion
@@ -77,6 +84,18 @@ namespace MiPlan.Models
         public DataContext DataContext
         {
             get;
+        }
+
+        /// <summary>
+        /// Gets BU data context for model.
+        /// </summary>
+        public DataContext BUDataContext
+        {
+            get
+            {
+                return m_buContext ?? (m_buContext = new DataContext("businessUnitDB", exceptionHandler: MvcApplication.LogException));
+
+            }
         }
 
         #endregion
@@ -124,14 +143,17 @@ namespace MiPlan.Models
         /// Renders client-side Javascript function for looking up single values from a table.
         /// </summary>
         /// <param name="valueFieldName">Table field name as defined in the table.</param>
+        /// <param name="dataContext">Use different datacontext than default</param>
         /// <param name="idFieldName">Name of primary key field, defaults to "ID".</param>
         /// <returns>Client-side Javascript lookup function.</returns>
-        public string RenderAbstract<T>(string valueFieldName, string idFieldName = "ID") where T : class, new()
+        public string RenderAbstract<T>(string valueFieldName, DataContext dataContext = null, string idFieldName = "ID") where T : class, new()
         {
+            if (dataContext == null) dataContext = DataContext;
+        
             StringBuilder javascript = new StringBuilder();
 
             var lookupFunctionName = $"lookup{valueFieldName}Value";
-            TableOperations<T> operations = DataContext.Table<T>() as TableOperations<T>;
+            TableOperations<T> operations = dataContext.Table<T>() as TableOperations<T>;
 
             javascript.AppendLine($"var {valueFieldName} = [];\r\n");
             foreach (T record in operations.QueryRecords())

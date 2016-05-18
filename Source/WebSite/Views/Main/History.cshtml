@@ -26,6 +26,8 @@
 @model AppModel
 @{
     DataContext dataContext = Model.DataContext;
+    DataContext buContext = Model.BUDataContext;
+
     ViewBag.HideAddNewButton = true;
 }
 
@@ -52,7 +54,7 @@
     <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
     <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNameValue(BusinessUnitID)"></div></td>
     <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
-    <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">Actions&nbsp;&nbsp;<span class="badge" data-bind="text: getActionCount(ID, $($element)), attr: {id: 'actionCount' + ID}">0</span></button></td>
     <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
 }
 @Html.Partial("PagedViewModel")
@@ -84,7 +86,7 @@
 @section Scripts {
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlan>(ViewBag, "ID", "true"))
-        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name", buContext))
         
         function openMenuItemEditor(record) {
             //console.log(record);
@@ -137,6 +139,16 @@
             // Clear frame page
             $("#manageDocumentsFrame").attr("src", "about:blank");
         });
+        
+        function getActionCount(sourceID, element) {
+            if (viewModel.dataHubIsConnected()) {
+                dataHub.queryActionItemCount(sourceID, null).done(function (count) {
+                    $(element).text(count.toString());
+                });
+            }
+
+            return element.text();
+        }
 
         $(function () {
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });

@@ -31,6 +31,8 @@
 
 @{
     DataContext dataContext = Model.DataContext;
+    DataContext buContext = Model.BUDataContext;
+
     string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
     statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
 
@@ -131,7 +133,7 @@
         <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
         <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupAbbreviationValue(BusinessUnitID)"></div></td>
         <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
-        <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">View</button></td>
+        <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">Actions&nbsp;&nbsp;<span class="badge" data-bind="text: getActionCount(ID, $($element)), attr: {id: 'actionCount' + ID}">0</span></button></td>
         <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openStartTracking.bind($data), visible: getActionStatusKey($data, $($element))" class="btn btn-danger btn-sm">Start</button></td>
         <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
         <td width="5%" class="text-center valign-middle" nowrap>
@@ -197,7 +199,7 @@
 @Scripts.Render("~/js.bundle/fileinput")
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlan>(ViewBag, "ID", "false"))
-        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation"))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation", buContext))
 
 
         function getStatusImage(element, record) {
@@ -397,6 +399,16 @@
 
             return element.text();
         }
+        
+        function getActionCount(sourceID, element) {
+            if (viewModel.dataHubIsConnected()) {
+                dataHub.queryActionItemCount(sourceID, null).done(function (count) {
+                    $(element).text(count.toString());
+                });
+            }
+
+            return element.text();
+        }
 
         $(window).resize(function() {
             setTimeout(function() {
@@ -443,7 +455,16 @@
                     minFileCount: 1,
                     maxFileCount: 12
                 });
-
+                
+                if (viewModel.dataHubIsConnected()) {
+                    dataHub.queryBusinessUnits().done(function (data) {
+                        $('#selectBusinessUnitID').children().remove();
+                        $.each(data, function (key, val) {
+                            $('#selectBusinessUnitID').append(new Option(val.Name, val.ID));
+                        });
+                    });
+                }
+                
             });
         });
     </script>

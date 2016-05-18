@@ -26,6 +26,7 @@
 @model AppModel
 @{
     DataContext dataContext = Model.DataContext;
+    DataContext buContext = Model.BUDataContext;
 
     string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
     statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
@@ -238,7 +239,7 @@
 
 <script>
     @Html.Raw(Model.RenderAbstract<MitigationPlan>("Title"))
-    @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name"))
+    @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name", buContext))
 
     function HomePageViewModel() {
         var self = this;

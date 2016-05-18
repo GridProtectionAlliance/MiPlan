@@ -53,7 +53,7 @@
 @section Scripts {
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<NoticeLog>(ViewBag))
-        @Html.Raw(Model.RenderAbstract<UncompletedMitigationPlan>("Title"))
+        @Html.Raw(Model.RenderAbstract<MitigationPlan>("Title"))
         @Html.Raw(Model.RenderValueListClientLookupFunction("noticeMethod"))
     </script>
 }

@@ -48,6 +48,7 @@ namespace MiPlan
 
         // Fields
         private readonly DataContext m_dataContext;
+        private DataContext m_buContext;
         private bool m_disposed;
 
         #endregion
@@ -67,6 +68,10 @@ namespace MiPlan
         /// Gets <see cref="IRecordOperationsHub.RecordOperationsCache"/> for SignalR hub.
         /// </summary>
         public RecordOperationsCache RecordOperationsCache => s_recordOperationsCache;
+
+        // Gets reference to MiPlan context, creating it if needed
+        private DataContext BUContext => m_buContext ?? (m_buContext = new DataContext("businessUnitDB", exceptionHandler: MvcApplication.LogException));
+
 
         #endregion
 
@@ -342,18 +347,23 @@ namespace MiPlan
         public int QueryBusinessUnitGroupCount(bool showDeleted, string filterText)
         {
             if (showDeleted)
-                return m_dataContext.Table<BusinessUnit>().QueryRecordCount();
+                return BUContext.Table<BusinessUnit>().QueryRecordCount();
 
-            return m_dataContext.Table<BusinessUnit>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
+            return BUContext.Table<BusinessUnit>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
         }
 
         [RecordOperation(typeof(BusinessUnit), RecordOperation.QueryRecords)]
         public IEnumerable<BusinessUnit> QueryBusinessUnitGroups(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
             if (showDeleted)
-                return m_dataContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize);
+                return BUContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize);
 
-            return m_dataContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+            return BUContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+        }
+
+        public IEnumerable<BusinessUnit> QueryBusinessUnits()
+        {
+            return BUContext.Table<BusinessUnit>().QueryRecords(restriction: new RecordRestriction("IsDeleted = 0"));
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
@@ -361,7 +371,7 @@ namespace MiPlan
         public void DeleteBusinessUnitGroup(int id)
         {
             // For BusinessUnitGroups, we only "mark" a record as deleted
-            m_dataContext.Connection.ExecuteNonQuery("UPDATE BusinessUnitGroup SET IsDeleted=1 WHERE ID={0}", id);
+            BUContext.Connection.ExecuteNonQuery("UPDATE BusinessUnitGroup SET IsDeleted=1 WHERE ID={0}", id);
         }
 
         [RecordOperation(typeof(BusinessUnit), RecordOperation.CreateNewRecord)]
@@ -378,7 +388,7 @@ namespace MiPlan
             record.CreatedOn = DateTime.UtcNow;
             record.UpdatedByID = record.CreatedByID;
             record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<BusinessUnit>().AddNewRecord(record);
+            BUContext.Table<BusinessUnit>().AddNewRecord(record);
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
@@ -387,7 +397,7 @@ namespace MiPlan
         {
             record.UpdatedByID = GetCurrentUserID();
             record.UpdatedOn = DateTime.UtcNow;
-            m_dataContext.Table<BusinessUnit>().UpdateRecord(record);
+            BUContext.Table<BusinessUnit>().UpdateRecord(record);
         }
 
         #endregion
