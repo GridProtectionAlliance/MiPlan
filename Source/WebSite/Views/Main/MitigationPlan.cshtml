@@ -148,7 +148,11 @@
     <div class="col-md-12">
 
         @Html.Raw(dataContext.AddInputField<MitigationPlan>("Title"))
-        @Html.Raw(dataContext.AddSelectField<MitigationPlan, BusinessUnit>("BusinessUnitID", "ID", "Name"))
+        @*@Html.Raw(dataContext.AddSelectField<MitigationPlan, BusinessUnit>("BusinessUnitID", "ID", "Name"))*@
+        <div class="form-group">
+            <label for="buIDSelction">Business Unit:</label>
+            <select class="form-control" id="buIDSelction"></select>
+        </div>
         @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
         {
 
@@ -374,6 +378,7 @@
         });
 
         $(viewModel).on("recordSaved", function (event, record, newRecord) {
+            console.log(record);
             if (newRecord && selectedFiles.length > 0 && viewModel.dataHubIsConnected()) {
                 dataHub.getLastMitigationPlanID().done(function (planID) {
                     $("#uploadFiles").fileinput({
@@ -440,6 +445,11 @@
             // Clear frame page
             $("#manageDocumentsFrame").attr("src", "about:blank");
         });
+        
+        $(viewModel).on("beforeSave", function (event, observableRecord) {
+            observableRecord.BusinessUnitID = $('#buIDSelction').val();
+        });
+
 
         $(function () {
             $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });
@@ -458,13 +468,15 @@
                 
                 if (viewModel.dataHubIsConnected()) {
                     dataHub.queryBusinessUnits().done(function (data) {
-                        $('#selectBusinessUnitID').children().remove();
                         $.each(data, function (key, val) {
-                            $('#selectBusinessUnitID').append(new Option(val.Name, val.ID));
+                            console.log(key);
+                            var selected = false;
+                            if (key == 1) selected = true;
+                            $('#buIDSelction').append(new Option(val.Name, val.ID, true, selected));
                         });
+
                     });
                 }
-                
             });
         });
     </script>

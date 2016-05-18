@@ -210,8 +210,10 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
         public void UpdateMitigationPlan(MitigationPlan record)
         {
+            record.ThemeID = 13;
             record.UpdatedByID = GetCurrentUserID();
             record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = false;
             m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
         }
 
