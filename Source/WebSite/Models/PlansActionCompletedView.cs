@@ -6,7 +6,7 @@ using GSF.Data.Model;
 
 namespace MiPlan.Models
 {
-    [System.Web.DynamicData.TableName("PlansActionCompletedView")]
+    [TableName("PlansActionCompletedView")]
     public class PlansActionCompletedView: MitigationPlan
     {
 

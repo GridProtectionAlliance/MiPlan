@@ -41,6 +41,7 @@ function PagedViewModel() {
     self.defaultSortAscending = true;                               // Default sort ascending flag
     self.initialFocusField = "";                                    // Initial add/edit field with focus
     self.modelName = "{name}";                                      // Name of model used for cookie names, defaults to page title
+    self.filterText = '%';                                         // filter string                              
 
     // Observable fields
     self.pageRecords = ko.observableArray();                        // Records queried for current page
@@ -228,7 +229,7 @@ function PagedViewModel() {
 
         if (self.dataHubIsConnected()) {
             // Query total record count
-            self.queryRecordCount().done(function (count) {
+            self.queryRecordCount(self.filterText).done(function (count) {
                 // Update record count observable
                 self.recordCount(count);
 
@@ -377,14 +378,32 @@ function PagedViewModel() {
 
     self.queryPageRecords = function () {
         if (self.dataHubIsConnected())
-            self.queryRecords(self.sortField(), self.sortAscending(), self.currentPage(), self.currentPageSize()).done(function (records) {
+            self.queryRecords(self.sortField(), self.sortAscending(), self.currentPage(), self.currentPageSize(), self.filterText).done(function (records) {
                 $(self).trigger("pageRecordsQueried", [records]);
                 self.pageRecords.removeAll();
                 self.pageRecords(records);
                 refreshHubDependentControlState();
                 $("[id='recordRow']").css("visibility", "visible");
                 $("#loadingDataLabel").hide();
+                // Validate proper page size after any record refresh
+                setTimeout(self.calculatePageSize, 150);
+            }).fail(function (error) {
+                showErrorMessage(error);
+            });
+    }
 
+    self.filterPageRecords = function () {
+        if (self.dataHubIsConnected())
+            self.queryRecordCount(self.filterText).done(function (count) {
+                self.recordCount(count);
+            });
+        self.queryRecords(self.sortField(), self.sortAscending(),0, self.currentPageSize(), self.filterText).done(function (records) {
+                $(self).trigger("pageRecordsQueried", [records]);
+                self.pageRecords.removeAll();
+                self.pageRecords(records);
+                refreshHubDependentControlState();
+                $("[id='recordRow']").css("visibility", "visible");
+                $("#loadingDataLabel").hide();
                 // Validate proper page size after any record refresh
                 setTimeout(self.calculatePageSize, 150);
             }).fail(function (error) {
@@ -478,14 +497,14 @@ function PagedViewModel() {
         });
     }
 
-    self.addPageRecord = function () {
+    self.addPageRecord = function (oldRecord) {
         if (!self.canAddNew())
             return;
 
         if (self.dataHubIsConnected()) {
             self.newRecord().done(function (emptyRecord) {
                 // Raise event to allow any new record initialization
-                $(self).trigger("newRecord", [emptyRecord]);
+                $(self).trigger("newRecord", [emptyRecord, oldRecord]);
 
                 self.deriveObservableRecord(emptyRecord).done(function (observableRecord) {
                     self.recordMode(RecordMode.AddNew);

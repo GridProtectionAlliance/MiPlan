@@ -41,7 +41,7 @@ namespace MiPlan.Models
         public int ID { get; set; }
 
         [Required]
-        [Label("Patch")]
+        [Label("Plan Title")]
         [StringLength(80)]
         public string Title { get; set; }
 

@@ -113,7 +113,7 @@
 {
         //    { "Field", "Label", "Classes" }
         new[] { null, "Status", "text-center valign-middle"},
-        new[] { "Title", "SPM Reference", "text-left" },
+        new[] { "Title", "Plan Title", "text-left" },
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
         new[] { "Field1", "Title", "text-left"},
         new[] { null, "Actions", "text-center valign-middle" },
@@ -144,27 +144,26 @@
 
 @helper AddNewEditDialog(DataContext dataContext)
 {
+        @Html.Raw(dataContext.AddInputField<MitigationPlanUnapproved>("Title"))
 
-    <div class="col-md-12">
-
-        @Html.Raw(dataContext.AddInputField<MitigationPlan>("Title"))
         <div data-bind="visible: $parent.recordMode()==RecordMode.AddNew ||$parent.recordMode()==RecordMode.Edit ">
             <div class="form-group">
                 <label for="buIDSelction">Business Unit:</label>
                 <select class="form-control" id="buIDSelction"></select>
             </div>
         </div>
-        <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
-            @Html.Raw(dataContext.AddInputField<MitigationPlan>("BusinessUnitID"))
-        </div>
-            @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
+    <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
+        @Html.Raw(dataContext.AddInputField<MitigationPlanUnapproved>("BusinessUnitID"))
+    </div>
+
+            for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
             {
 
-                @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+                @Html.Raw(dataContext.AddTextAreaField<MitigationPlanUnapproved>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
             }
-            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
-            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
-        </div>
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlanUnapproved>("Description"))
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlanUnapproved>("StatusNotes"))
+
 
     <div class="row" data-bind="visible: $parent.recordMode()==RecordMode.AddNew">
         <div class="col-md-12">
@@ -460,6 +459,7 @@
             $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });
 
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
+
             $("#addNewEditDialog").on("shown.bs.modal", function () {
                 $("#uploadFiles").fileinput({
                     uploadUrl: fileUploadUrl,
@@ -474,7 +474,6 @@
                 if (viewModel.dataHubIsConnected()) {
                     dataHub.queryBusinessUnits().done(function (data) {
                         $.each(data, function (key, val) {
-                            console.log(key);
                             var selected = false;
                             if (key == 1) selected = true;
                             $('#buIDSelction').append(new Option(val.Name, val.ID, true, selected));
