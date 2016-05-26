@@ -227,6 +227,163 @@ namespace MiPlan
             m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
         }
 
+        public void UpdateMitigationPlanApproval(int parentID)
+        {
+            m_dataContext.Connection.ExecuteNonQuery("Update MitigationPlan SET IsApproved = 1 WHERE ID = {0}", parentID);
+        }
+
+        #endregion
+
+        #region [ MitigationPlanUnapproved Table Operations ]
+
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.QueryRecordCount)]
+        public int QueryMitigationPlanUnapprovedCount(bool showDeleted,  string filterText)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecordCount(new RecordRestriction("IsCompleted = 0 AND IsApproved = 0"));
+
+            return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 0"));
+        }
+
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.QueryRecords)]
+        public IEnumerable<MitigationPlanUnapproved> QueryMitigationPlanUnapprovedes(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = 0 AND IsApproved = 0"));
+
+            return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 0"));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        public int GetLastMitigationPlanUnapprovedID()
+        {
+            return m_dataContext.Connection.ExecuteScalar<int?>("SELECT IDENT_CURRENT('MitigationPlan')") ?? 0;
+        }
+
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.DeleteRecord)]
+        public void DeleteMitigationPlanUnapproved(int id)
+        {
+            // For MitigationPlanUnapprovedes, we only "mark" a record as deleted
+            m_dataContext.Connection.ExecuteNonQuery("UPDATE MitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
+        }
+
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.CreateNewRecord)]
+        public MitigationPlanUnapproved NewMitigationPlanUnapproved()
+        {
+            return new MitigationPlanUnapproved();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, Editor")]
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.AddNewRecord)]
+        public void AddNewMitigationPlanUnapproved(MitigationPlanUnapproved record)
+        {
+            record.CreatedByID = GetCurrentUserID();
+            record.CreatedOn = DateTime.UtcNow;
+            record.UpdatedByID = record.CreatedByID;
+            record.UpdatedOn = record.CreatedOn;
+            record.IsCompleted = false;
+            m_dataContext.Table<MitigationPlanUnapproved>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.UpdateRecord)]
+        public void UpdateMitigationPlanUnapproved(MitigationPlanUnapproved record)
+        {
+            record.ThemeID = 13;
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = false;
+            m_dataContext.Table<MitigationPlanUnapproved>().UpdateRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.UpdateRecord)]
+        public void CompleteMitigationPlanUnapproved(MitigationPlanUnapproved record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = true;
+            m_dataContext.Table<MitigationPlanUnapproved>().UpdateRecord(record);
+        }
+
+        #endregion
+
+        #region [ MitigationPlanApproved Table Operations ]
+
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.QueryRecordCount)]
+        public int QueryMitigationPlanApprovedCount(bool showDeleted, string filterText)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanApproved>().QueryRecordCount(new RecordRestriction("IsCompleted = 0 AND IsApproved = 1"));
+
+            return m_dataContext.Table<MitigationPlanApproved>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 1"));
+        }
+
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.QueryRecords)]
+        public IEnumerable<MitigationPlanApproved> QueryMitigationPlanApprovedes(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
+        {
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanApproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = 0 AND IsApproved = 1"));
+
+            return m_dataContext.Table<MitigationPlanApproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 1"));
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        public int GetLastMitigationPlanApprovedID()
+        {
+            return m_dataContext.Connection.ExecuteScalar<int?>("SELECT IDENT_CURRENT('MitigationPlan')") ?? 0;
+        }
+
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.DeleteRecord)]
+        public void DeleteMitigationPlanApproved(int id)
+        {
+            // For MitigationPlanApprovedes, we only "mark" a record as deleted
+            m_dataContext.Connection.ExecuteNonQuery("UPDATE MitigationPlan SET IsDeleted=1 WHERE ID={0}", id);
+        }
+
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.CreateNewRecord)]
+        public MitigationPlanApproved NewMitigationPlanApproved()
+        {
+            return new MitigationPlanApproved();
+        }
+
+        [AuthorizeHubRole("Administrator, Owner, Editor")]
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.AddNewRecord)]
+        public void AddNewMitigationPlanApproved(MitigationPlanApproved record)
+        {
+            record.CreatedByID = GetCurrentUserID();
+            record.CreatedOn = DateTime.UtcNow;
+            record.UpdatedByID = record.CreatedByID;
+            record.UpdatedOn = record.CreatedOn;
+            record.IsCompleted = false;
+            m_dataContext.Table<MitigationPlanApproved>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.UpdateRecord)]
+        public void UpdateMitigationPlanApproved(MitigationPlanApproved record)
+        {
+            record.ThemeID = 13;
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = false;
+            m_dataContext.Table<MitigationPlanApproved>().UpdateRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.UpdateRecord)]
+        public void CompleteMitigationPlanApproved(MitigationPlanApproved record)
+        {
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = true;
+            m_dataContext.Table<MitigationPlanApproved>().UpdateRecord(record);
+        }
+
         #endregion
 
         #region [ ActionItem Table Operations ]

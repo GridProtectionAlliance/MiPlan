@@ -1,25 +1,25 @@
 ﻿@*******************************************************************************************************
-//  Plan.cshtml - Gbtc
-//
-//  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
-//
-//  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
-//  the NOTICE file distributed with this work for additional information regarding copyright ownership.
-//  The GPA licenses this file to you under the MIT License (MIT), the "License"; you may not use this
-//  file except in compliance with the License. You may obtain a copy of the License at:
-//
-//      http://opensource.org/licenses/MIT
-//
-//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
-//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
-//  License for the specific language governing permissions and limitations.
-//
-//  Code Modification History:
-//  ----------------------------------------------------------------------------------------------------
-//  03/03/2016 - Russell Robertson
-//       Generated original version of source code.
-//
-//*****************************************************************************************************@
+    //  ActivePlans.cshtml - Gbtc
+    //
+    //  Copyright © 2016, Grid Protection Alliance.  All Rights Reserved.
+    //
+    //  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
+    //  the NOTICE file distributed with this work for additional information regarding copyright ownership.
+    //  The GPA licenses this file to you under the MIT License (MIT), the "License"; you may not use this
+    //  file except in compliance with the License. You may obtain a copy of the License at:
+    //
+    //      http://opensource.org/licenses/MIT
+    //
+    //  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+    //  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+    //  License for the specific language governing permissions and limitations.
+    //
+    //  Code Modification History:
+    //  ----------------------------------------------------------------------------------------------------
+    //  03/03/2016 - Russell Robertson
+    //       Generated original version of source code.
+    //
+    //*****************************************************************************************************@
 
 @using MiPlan.Models
 @using GSF
@@ -46,68 +46,69 @@
     const string deferredImage = "bluelight.png";
     const string waitingImage = "greylight.png";
 
+    ViewBag.HideAddNewButton = true;
+
 }
 @*<p>&nbsp;</p>
-<ul>
-    <li>A list of "open" mitigation plans will be displayed.</li>
-    <li>A filter will be available at the top of the screen for "Business Unit" and default to the BUCs or SMEs BU -- or to "all" for everyone else.</li>
-    <li>There can be multiple plans available for each patch.</li>
-    <li>The list will be sorted by patchID (the TVA assigned label), BUG, and title.</li>
-    <li>An SPM can create a new plan for this patch for their BU.  Only one plan per BUgroup per patch is allowed.</li>
-    <li>A BUC can delete a plan for their BUG provided they have not approved it.  Following plan approval, only the Owner can remove it.  It will be marked as deleted in the database -- but will have no GUI tools available to retrieve it -- since there 
-    can only be one plan per patch per BUG.</li>
-    <li>Unfortunately, if a plan is required then this plan is for this BUG only.  If it turns out there is a common plan that is shared among BUs, then this plan must be replicated since the action items for execution of the plan are assigned the BUG
-    that owns it.</li>
-    <li>The BUC must approve the plan as a whole to stop the compliance timer.</li>
-    <li>A BUC can add or remove action items in a Plan following approval without compliance impact.</li>
-  
+    <ul>
+        <li>A list of "open" mitigation plans will be displayed.</li>
+        <li>A filter will be available at the top of the screen for "Business Unit" and default to the BUCs or SMEs BU -- or to "all" for everyone else.</li>
+        <li>There can be multiple plans available for each patch.</li>
+        <li>The list will be sorted by patchID (the TVA assigned label), BUG, and title.</li>
+        <li>An SPM can create a new plan for this patch for their BU.  Only one plan per BUgroup per patch is allowed.</li>
+        <li>A BUC can delete a plan for their BUG provided they have not approved it.  Following plan approval, only the Owner can remove it.  It will be marked as deleted in the database -- but will have no GUI tools available to retrieve it -- since there
+        can only be one plan per patch per BUG.</li>
+        <li>Unfortunately, if a plan is required then this plan is for this BUG only.  If it turns out there is a common plan that is shared among BUs, then this plan must be replicated since the action items for execution of the plan are assigned the BUG
+        that owns it.</li>
+        <li>The BUC must approve the plan as a whole to stop the compliance timer.</li>
+        <li>A BUC can add or remove action items in a Plan following approval without compliance impact.</li>
 
-</ul>
-<p>&nbsp;</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>&nbsp;</th>
-            <th>Required Fields</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td>Patch Identifier</td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Justification</td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Summary</td>
-        </tr>
-       
-    </tbody>
-</table>*@
+
+    </ul>
+    <p>&nbsp;</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Required Fields</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Patch Identifier</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Justification</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Summary</td>
+            </tr>
+
+        </tbody>
+    </table>*@
 @*<p>&nbsp;</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>&nbsp;</th>
-            <th>Optional Fields</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1</td>
-            <td>Risk</td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>Detail</td>
-        </tr>
-       
-    </tbody>
-</table>*@
+    <table class="table">
+        <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Optional Fields</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Risk</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Detail</td>
+            </tr>
 
+        </tbody>
+    </table>*@
 @{
     ViewBag.HeaderColumns = new[]
 {
@@ -117,7 +118,6 @@
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
         new[] { "Field1", "Title", "text-left"},
         new[] { null, "Actions", "text-center valign-middle" },
-        new[] { null, "Tracking", "text-center valign-middle" },
         new[] { null, "Documents", "text-center valign-middle" }
 
     };
@@ -129,12 +129,11 @@
 }
 @helper BodyRows()
 {
-        <td width="5%" class="text-center valign-middle"><img src="~/Images/StatusLights/Small/greenlight.png" alt="OK" title="OK" data-bind="attr: {'update-attr': getStatusImage($($element), $data)}"></td>
+    <td width="5%" class="text-center valign-middle"><img src="~/Images/StatusLights/Small/greenlight.png" alt="OK" title="OK" data-bind="attr: {'update-attr': getStatusImage($($element), $data)}"></td>
         <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
         <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupAbbreviationValue(BusinessUnitID)"></div></td>
         <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
         <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">Actions&nbsp;&nbsp;<span class="badge" data-bind="text: getActionCount(ID, $($element)), attr: {id: 'actionCount' + ID}">0</span></button></td>
-        <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openStartTracking.bind($data), visible: getActionStatusKey($data, $($element))" class="btn btn-danger btn-sm">Start</button></td>
         <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
         <td width="5%" class="text-center valign-middle" nowrap>
             <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
@@ -157,23 +156,23 @@
         <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
             @Html.Raw(dataContext.AddInputField<MitigationPlan>("BusinessUnitID"))
         </div>
-            @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
-            {
+        @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
+        {
 
-                @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
-            }
-            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
-            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
-        </div>
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+        }
+        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
+        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
+    </div>
 
-    <div class="row" data-bind="visible: $parent.recordMode()==RecordMode.AddNew">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="uploadFiles">Add Plan Related Documents:</label>
-                <input id="uploadFiles" name="uploadFiles[]" type="file" multiple class="file-loading">
+        <div class="row" data-bind="visible: $parent.recordMode()==RecordMode.AddNew">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="uploadFiles">Add Plan Related Documents:</label>
+                    <input id="uploadFiles" name="uploadFiles[]" type="file" multiple class="file-loading">
+                </div>
             </div>
         </div>
-    </div>
 
 }
 @Html.Partial("PagedViewModel")
@@ -204,9 +203,9 @@
 
 
 @section Scripts {
-@Scripts.Render("~/js.bundle/fileinput")
+    @Scripts.Render("~/js.bundle/fileinput")
     <script>
-        @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlanUnapproved>(ViewBag))
+        @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlanApproved>(ViewBag))
         @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation", buContext))
 
 
@@ -235,7 +234,7 @@
                         });
                         //console.log(flag);
                     }
-                   
+
                     if (flag === 1) {
                         image = "@pastDueImage";
                         title = "Actions are past due";
@@ -276,58 +275,6 @@
             return undefined;
         }
 
-        function openStartTracking(record) {
-            if (viewModel.dataHubIsConnected()) {
-                dataHub.updateMitigationPlanApproval(record.ID);
-                dataHub.queryActionItems(record.ID).done(function(data) {
-                    data.forEach(function(i) {
-                        //console.log(i);
-                        if(i.ActionTypeKey == 1)
-                            ++i.ActionTypeKey;
-                        dataHub.updateActionItem(i).done(function() {
-                            viewModel.queryPageRecords();
-                        });
-                    });
-
-                });
-            }
-
-            //console.log(record);
-            //    var email = 'bernest@gridprotectionalliance.org';
-            //    var subject = 'Plan pending Approval for ' + record.Title;
-            //    var body_message = "NOTIFICATION: %0A%0A" +
-            //        "The following  mitigation plan is pending approval...%0A%0A" +
-            //        "Plan: " + record.Title + "%0A" +
-            //        "Business Unit: " + lookupNameValue(record.BusinessUnitID) + "%0A" +
-            //        "Description: " + record.Description + "%0A%0A" +
-            //        "Actions: %0A";
-
-
-            //    if (viewModel.dataHubIsConnected()) {
-            //        dataHub.queryActionItems(record.ID).done(function(data) {
-            //            data.forEach(function(i) {
-            //                //console.log(i);
-            //                body_message += " - Title: " + i.Title + "  Details: " + i.Details + "%0A";
-            //            });
-            //            var mailto_link = 'mailto:' + email + '?subject=' + subject + '&body=' + body_message;
-            //            window.open(mailto_link, 'emailWindow');
-            //            //if (win && win.open && !win.closed) win.close();
-            //        });
-
-            //        var noticeRecord = { PatchID: record.ID, NoticeMethodKey: 1, ToUsers: email, Text: body_message, SentOn: (new Date()) }
-            //        dataHub.addNewNoticeLog(noticeRecord);
-            //    }
-        }
-
-        function getActionStatusKey(record, element) {
-            if (viewModel.dataHubIsConnected()) {
-                dataHub.queryActionItems(record.ID).done(function(data) {
-                    data.forEach(function(i) { if (i.ActionTypeKey === 1) element.show(); });
-
-                });
-            }
-
-        }
 
         function getActionItemCount(pageID, element) {
             //console.log(PageID);
@@ -373,10 +320,10 @@
             // Clear frame page
             $("#editActionItemFrame").attr("src", "about:blank");
         });
-        
+
         const fileUploadUrl = "@Html.Raw(Url.Content("~/FileUploadHandler.ashx?SourceTable=MitigationPlanDocument&SourceField=MitigationPlanID"))";
         var selectedFiles;
-        
+
 
         $(viewModel).on("beforeSave", function (event, observableRecord) {
             selectedFiles = $("#uploadFiles").fileinput("getFileStack");
@@ -399,7 +346,7 @@
                 });
             }
         });
-        
+
         function getDocumentCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryDocumentDetailCount("MitigationPlan", sourceID, null).done(function(count) {
@@ -409,7 +356,7 @@
 
             return element.text();
         }
-        
+
         function getActionCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryActionItemCount(sourceID, null).done(function (count) {
@@ -450,7 +397,7 @@
             // Clear frame page
             $("#manageDocumentsFrame").attr("src", "about:blank");
         });
-        
+
         $(viewModel).on("beforeSave", function (event, observableRecord) {
             observableRecord.BusinessUnitID = $('#buIDSelction').val();
         });
@@ -470,7 +417,7 @@
                     minFileCount: 1,
                     maxFileCount: 12
                 });
-                
+
                 if (viewModel.dataHubIsConnected()) {
                     dataHub.queryBusinessUnits().done(function (data) {
                         $.each(data, function (key, val) {

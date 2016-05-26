@@ -31,6 +31,8 @@ namespace MiPlan.Models
     /// <summary>
     /// Model for MiPlan.Plan table.
     /// </summary>
+    
+    [TableName("MitigationPlan")]
     [PrimaryLabel("Summary")]
     [IsDeletedFlag("IsDeleted")]
     public class MitigationPlan
@@ -82,5 +84,6 @@ namespace MiPlan.Models
         public Guid UpdatedByID { get; set; }
 
         public bool IsCompleted { get; set; }
+        public bool IsApproved { get; set; }
     }
 }

@@ -201,6 +201,17 @@ namespace MiPlan.Controllers
             return View();
         }
 
+        public ActionResult ActivePlans()
+        {
+            int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
+            m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "ActivePlans", ViewBag);
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ViewBag.ThemeFields = fields;
+            ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
+            return View();
+        }
+
+
         public ActionResult Notification()
         {
             m_appModel.ConfigureView<NoticeLog>(Url.RequestContext, "Notification", ViewBag);
