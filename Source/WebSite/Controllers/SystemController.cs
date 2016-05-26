@@ -120,6 +120,18 @@ namespace MiPlan.Controllers
             return View();
         }
 
+        public ActionResult Theme()
+        {
+            m_appModel.ConfigureView<Theme>(Url.RequestContext, "System.Theme", ViewBag);
+            return View();
+        }
+
+        public ActionResult ThemeFields()
+        {
+            m_appModel.ConfigureView<ThemeFields>(Url.RequestContext, "System.ThemeFields", ViewBag);
+            return View();
+        }
+
         #endregion
     }
 }

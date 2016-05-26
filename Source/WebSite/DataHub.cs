@@ -647,34 +647,6 @@ namespace MiPlan
 
         #endregion
 
-        #region [ ThemeFields Table Operations ]
-
-
-        [AuthorizeHubRole("Administrator")]
-        [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecordCount)]
-        public int QueryThemeFieldsCount(int parentID, string filterText)
-        {
-            return m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("GroupID = {0}", parentID));
-        }
-
-        [AuthorizeHubRole("Administrator")]
-        [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecords)]
-        public IEnumerable<ThemeFields> QueryThemeFieldsItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
-        {
-            return m_dataContext.Table<ThemeFields>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("GroupID = {0}", parentID));
-        }
-
-        [AuthorizeHubRole("Administrator")]
-        [RecordOperation(typeof(ThemeFields), RecordOperation.DeleteRecord)]
-        public void DeleteThemeFields(int id)
-        {
-            m_dataContext.Table<ThemeFields>().DeleteRecord(id);
-        }
-
-     
-
-        #endregion
-
         #region [ MitigationPlanActionItemsCompleted View Operations ]
 
         [RecordOperation(typeof(MitigationPlanActionItemsCompleted), RecordOperation.QueryRecordCount)]
@@ -868,6 +840,115 @@ namespace MiPlan
 
         #endregion
 
+        #region [ Theme Table Operations ]
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(Theme), RecordOperation.QueryRecordCount)]
+        public int QueryThemeCount(string filterText)
+        {
+            return m_dataContext.Table<Theme>().QueryRecordCount();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(Theme), RecordOperation.QueryRecords)]
+        public IEnumerable<Theme> QueryThemes(string sortField, bool ascending, int page, int pageSize, string filterText)
+        {
+            return m_dataContext.Table<Theme>().QueryRecords(sortField, ascending, page, pageSize);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(Theme), RecordOperation.DeleteRecord)]
+        public void DeleteTheme(int id)
+        {
+            m_dataContext.Table<Theme>().DeleteRecord(id);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(Theme), RecordOperation.CreateNewRecord)]
+        public Theme NewTheme()
+        {
+            return new Theme();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(Theme), RecordOperation.AddNewRecord)]
+        public void AddNewTheme(Theme record)
+        {
+            if(record.IsDefault)
+            {
+                m_dataContext.Connection.ExecuteNonQuery("Update Theme SET IsDefault = 0");
+            }
+            record.CreatedOn = DateTime.UtcNow;
+            m_dataContext.Table<Theme>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(Theme), RecordOperation.UpdateRecord)]
+        public void UpdateTheme(Theme record)
+        {
+            if (record.IsDefault)
+            {
+                m_dataContext.Connection.ExecuteNonQuery("Update Theme SET IsDefault = 0");
+            }
+
+            m_dataContext.Table<Theme>().UpdateRecord(record);
+        }
+
+        #endregion
+
+        #region [ ThemeFields Table Operations ]
+
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecordCount)]
+        public int QueryThemeFieldsCount(int parentID, string filterText)
+        {
+            return m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.QueryRecords)]
+        public IEnumerable<ThemeFields> QueryThemeFieldsItems(int parentID, string sortField, bool ascending, int page, int pageSize, string filterText)
+        {
+            return m_dataContext.Table<ThemeFields>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("ThemeID = {0}", parentID));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.DeleteRecord)]
+        public void DeleteThemeFields(int id)
+        {
+            m_dataContext.Table<ThemeFields>().DeleteRecord(id);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.CreateNewRecord)]
+        public ThemeFields NewThemeFields()
+        {
+            return new ThemeFields();
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.AddNewRecord)]
+        public void AddNewThemeFields(ThemeFields record)
+        {
+            record.CreatedOn = DateTime.UtcNow;
+            record.FieldNumber = GetLastFieldNumber(record.ThemeID) + 1;
+            m_dataContext.Table<ThemeFields>().AddNewRecord(record);
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(ThemeFields), RecordOperation.UpdateRecord)]
+        public void UpdateThemeFields(ThemeFields record)
+        {
+            m_dataContext.Table<ThemeFields>().UpdateRecord(record);
+        }
+
+        public int GetLastFieldNumber(int parentID)
+        {
+            return m_dataContext.Connection.ExecuteScalar<int?>("SELECT MAX(FieldNumber) FROM ThemeFields WHERE ThemeID = {0}", parentID) ?? 0;
+        }
+
+        #endregion
 
         #region [ Miscellaneous Hub Operations ]
 

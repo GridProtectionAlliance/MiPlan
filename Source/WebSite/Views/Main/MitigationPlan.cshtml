@@ -148,19 +148,23 @@
     <div class="col-md-12">
 
         @Html.Raw(dataContext.AddInputField<MitigationPlan>("Title"))
-        @*@Html.Raw(dataContext.AddSelectField<MitigationPlan, BusinessUnit>("BusinessUnitID", "ID", "Name"))*@
-        <div class="form-group">
-            <label for="buIDSelction">Business Unit:</label>
-            <select class="form-control" id="buIDSelction"></select>
+        <div data-bind="visible: $parent.recordMode()==RecordMode.AddNew ||$parent.recordMode()==RecordMode.Edit ">
+            <div class="form-group">
+                <label for="buIDSelction">Business Unit:</label>
+                <select class="form-control" id="buIDSelction"></select>
+            </div>
         </div>
-        @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
-        {
+        <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
+            @Html.Raw(dataContext.AddInputField<MitigationPlan>("BusinessUnitID"))
+        </div>
+            @for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
+            {
 
-            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
-        }
-        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
-        @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
-    </div>
+                @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+            }
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Description"))
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("StatusNotes"))
+        </div>
 
     <div class="row" data-bind="visible: $parent.recordMode()==RecordMode.AddNew">
         <div class="col-md-12">
