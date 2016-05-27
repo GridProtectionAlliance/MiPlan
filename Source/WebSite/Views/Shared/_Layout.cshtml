@@ -92,7 +92,6 @@
         }
     }
 
-
     // Define ViewBag.CustomTitle in page code for custom page titles
     string pageTitle = ViewBag.CustomTitle ?? ViewBag.Title;
 
@@ -112,12 +111,15 @@
     <meta name="application-name" content="@Model.Global.ApplicationName" />
     <meta name="description" content="@Model.Global.ApplicationDescription" />
     <meta name="keywords" content="@Model.Global.ApplicationKeywords" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link href="@Url.Content("~/Content/bootstrap.min.css")" rel="stylesheet">
     <link href="@Url.Content(Model.Global.BootstrapTheme)" rel="stylesheet">
     @if (Model.Global.BootstrapTheme.EndsWith("bootstrap.min.css")) {
     <link href="~/Content/bootstrap-theme.min.css" rel="stylesheet">
     }
     @Styles.Render("~/css.bundle/bootstrap")
+    @Styles.Render("~/css.bundle/jqueryui")
+    @Styles.Render("~/css.bundle/primeui")
     @Styles.Render("~/css.bundle/site")
     @RenderSection("StyleSheets", false)
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -152,6 +154,7 @@
         const TimeFormat = "@Model.Global.TimeFormat";
         const DateTimeFormat = "@Model.Global.DateTimeFormat";
     </script>
+    
 </head>
 <body>
     <!-- #pageWrapper -->
@@ -179,9 +182,8 @@
                     }
                 </ul>
                 <footer id="footer">
-                    @if (showCopyright)
-                    {
-                      <p><a class="custom-text" href="@Url.Content(copyrightUrl)">@copyrightText</a></p>
+                    @if (showCopyright) {
+                        <p><a class="custom-text" href="@Url.Content(copyrightUrl)">@copyrightText</a></p>
                     }
                 </footer>
             </div>
@@ -220,11 +222,13 @@
     </div>
     <!-- /#pageWrapper -->
     @Scripts.Render("~/js.bundle/jquery")
+    @Scripts.Render("~/js.bundle/jqueryui")
     @Scripts.Render("~/js.bundle/bootstrap")
     @Scripts.Render("~/js.bundle/signalR")
     @Scripts.Render("~/js.bundle/gsfwebclient")
-    @* ReSharper disable once Html.PathError *@
+    @*ReSharper disable once Html.PathError*@ 
     <script src="@Url.Content("~/signalr/hubs")"></script>
+    @Scripts.Render("~/js.bundle/primeui")
     @Scripts.Render("~/js.bundle/site")
     @Html.Raw(ViewBag.PageControlScripts?.ToString())
     @RenderSection("Scripts", false)

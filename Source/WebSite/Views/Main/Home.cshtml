@@ -30,6 +30,8 @@
 
     string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
     statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
+    int pastDue = ViewBag.alarmLimits[0].Value;
+    int due = ViewBag.alarmLimits[1].Value;
 
 
 
@@ -265,11 +267,11 @@
         var daysUntilEnd = (dateFixer(record.ScheduledEndDate));
 
             switch (true) {
-                case (daysUntilEnd < 0):
+                case (daysUntilEnd < @pastDue):
                     image = "@pastDueImage";
                     title = "Past Due";
                     break;
-                case (daysUntilEnd < 7):
+                case (daysUntilEnd < @due):
                     image = "@dueImage";
                     title = "Due";
                     break;

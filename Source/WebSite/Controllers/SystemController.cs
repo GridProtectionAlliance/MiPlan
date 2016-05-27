@@ -132,6 +132,12 @@ namespace MiPlan.Controllers
             return View();
         }
 
+        public ActionResult SelectTheme()
+        {
+            m_appModel.ConfigureView(Url.RequestContext, "System.SelectTheme", ViewBag);
+            return View();
+        }
+
         #endregion
     }
 }

@@ -477,6 +477,7 @@
     <Content Include="Views\System\Theme.cshtml" />
     <Content Include="Views\System\ThemeFields.cshtml" />
     <Content Include="Views\Main\ActivePlans.cshtml" />
+    <Content Include="Views\System\SelectTheme.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
