@@ -131,7 +131,8 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlan>(ViewBag, "ID", "true"))
         @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation", buContext))
-        
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name", buContext))
+
         function openMenuItemEditor(record) {
             //console.log(record);
             $("#editActionItemFrame").attr({
@@ -183,7 +184,7 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
             // Clear frame page
             $("#manageDocumentsFrame").attr("src", "about:blank");
         });
-        
+
         function getActionCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryActionItemCount(sourceID, null).done(function (count) {
@@ -196,7 +197,7 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
 
         $(function () {
             $("#pageHeader").append("@Html.Raw(PlanFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
-            
+
             $('#planfilter').on('keyup', function (e) {
                 if ($('#planfilter').val().length == 0) {
                     viewModel.filterText = '%';
@@ -205,6 +206,22 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
                     viewModel.filterText = $('#planfilter').val();
                     viewModel.filterPageRecords();
 
+                }
+
+            });
+
+
+            $("#addNewEditDialog").on("shown.bs.modal", function () {
+                $('#readonlyinputBusinessUnitID').text(lookupNameValue($('#readonlyinputBusinessUnitID').text()));
+                if (viewModel.dataHubIsConnected()) {
+                    dataHub.queryBusinessUnits().done(function (data) {
+                        $.each(data, function (key, val) {
+                            var selected = false;
+                            if (key + 1 == viewModel.currentRecord().BusinessUnitID()) selected = true;
+                            $('#buIDSelction').append(new Option(val.Name, val.ID, true, selected));
+                        });
+
+                    });
                 }
 
             });

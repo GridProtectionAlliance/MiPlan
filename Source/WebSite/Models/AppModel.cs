@@ -46,6 +46,7 @@ namespace MiPlan.Models
         private DataContext m_buContext;
 
         #endregion
+
         #region [ Constructors ]
 
         /// <summary>

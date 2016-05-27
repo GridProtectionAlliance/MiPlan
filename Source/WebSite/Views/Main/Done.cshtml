@@ -133,13 +133,14 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<PlansActionCompletedView>(ViewBag))
         @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation", buContext))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name", buContext))
 
 
         function closePlan(record) {
             dataHub.completeMitigationPlan(record).done(function () {
                 viewModel.queryPageRecords();
             });
-            
+
         }
 
         function openMenuItemEditor(record) {
@@ -160,7 +161,7 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
             // Clear frame page
             $("#editActionItemFrame").attr("src", "about:blank");
         });
-        
+
         function getDocumentCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryDocumentDetailCount("MitigationPlan", sourceID, null).done(function(count) {
@@ -201,7 +202,7 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
             // Clear frame page
             $("#manageDocumentsFrame").attr("src", "about:blank");
         });
-        
+
         function getActionCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryActionItemCount(sourceID, null).done(function (count) {
@@ -215,7 +216,7 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
 
         $(function () {
             $("#pageHeader").append("@Html.Raw(PlanFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
-            
+
             $('#planfilter').on('keyup', function (e) {
                 if ($('#planfilter').val().length == 0) {
                     viewModel.filterText = '%';
@@ -228,7 +229,9 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
 
             });
 
-
+            $("#addNewEditDialog").on("shown.bs.modal", function () {
+                $('#readonlyinputBusinessUnitID').text(lookupNameValue($('#readonlyinputBusinessUnitID').text()));
+            });
 
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
             $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });

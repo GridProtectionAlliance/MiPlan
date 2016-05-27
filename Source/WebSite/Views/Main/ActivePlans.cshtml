@@ -172,6 +172,7 @@
                 <select class="form-control" id="buIDSelction"></select>
             </div>
         </div>
+
         <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
             @Html.Raw(dataContext.AddInputField<MitigationPlan>("BusinessUnitID"))
         </div>
@@ -226,6 +227,7 @@
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlanApproved>(ViewBag))
         @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation", buContext))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name", buContext))
 
 
         function getStatusImage(element, record) {
@@ -422,7 +424,7 @@
 
         $(function () {
             $("#pageHeader").append("@Html.Raw(PlanFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
-            
+
             $('#planfilter').on('keyup', function (e) {
                 if ($('#planfilter').val().length == 0) {
                     viewModel.filterText = '%';
@@ -441,6 +443,8 @@
 
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
             $("#addNewEditDialog").on("shown.bs.modal", function () {
+                $('#readonlyinputBusinessUnitID').text(lookupNameValue($('#readonlyinputBusinessUnitID').text()));
+
                 $("#uploadFiles").fileinput({
                     uploadUrl: fileUploadUrl,
                     uploadAsync: true,
@@ -456,7 +460,7 @@
                         $.each(data, function (key, val) {
                             console.log(key);
                             var selected = false;
-                            if (key == 1) selected = true;
+                            if (key + 1 == viewModel.currentRecord().BusinessUnitID()) selected = true;
                             $('#buIDSelction').append(new Option(val.Name, val.ID, true, selected));
                         });
 

@@ -174,7 +174,7 @@
             </div>
         </div>
     <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
-        @Html.Raw(dataContext.AddInputField<MitigationPlanUnapproved>("BusinessUnitID"))
+        @Html.Raw(dataContext.AddInputField<MitigationPlanUnapproved>("BusinessUnitID", fieldLabel: "Business Unit"))
     </div>
 
             for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
@@ -228,6 +228,8 @@
     <script>
         @Html.Raw(Model.RenderViewModelConfiguration<MitigationPlanUnapproved>(ViewBag))
         @Html.Raw(Model.RenderAbstract<BusinessUnit>("Abbreviation", buContext))
+        @Html.Raw(Model.RenderAbstract<BusinessUnit>("Name", buContext))
+
 
 
         function getStatusImage(element, record) {
@@ -255,7 +257,7 @@
                         });
                         //console.log(flag);
                     }
-                   
+
                     if (flag === 1) {
                         image = "@pastDueImage";
                         title = "Actions are past due";
@@ -393,13 +395,15 @@
             // Clear frame page
             $("#editActionItemFrame").attr("src", "about:blank");
         });
-        
+
         const fileUploadUrl = "@Html.Raw(Url.Content("~/FileUploadHandler.ashx?SourceTable=MitigationPlanDocument&SourceField=MitigationPlanID"))";
         var selectedFiles;
-        
+
 
         $(viewModel).on("beforeSave", function (event, observableRecord) {
             selectedFiles = $("#uploadFiles").fileinput("getFileStack");
+            observableRecord.BusinessUnitID = $('#buIDSelction').val();
+
         });
 
         $(viewModel).on("recordSaved", function (event, record, newRecord) {
@@ -419,7 +423,7 @@
                 });
             }
         });
-        
+
         function getDocumentCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryDocumentDetailCount("MitigationPlan", sourceID, null).done(function(count) {
@@ -429,7 +433,7 @@
 
             return element.text();
         }
-        
+
         function getActionCount(sourceID, element) {
             if (viewModel.dataHubIsConnected()) {
                 dataHub.queryActionItemCount(sourceID, null).done(function (count) {
@@ -470,16 +474,12 @@
             // Clear frame page
             $("#manageDocumentsFrame").attr("src", "about:blank");
         });
-        
-        $(viewModel).on("beforeSave", function (event, observableRecord) {
-            observableRecord.BusinessUnitID = $('#buIDSelction').val();
-        });
 
 
         $(function () {
-            
+
             $("#pageHeader").append("@Html.Raw(PlanFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
-            
+
             $('#planfilter').on('keyup', function (e) {
                 if ($('#planfilter').val().length == 0) {
                     viewModel.filterText = '%';
@@ -498,6 +498,7 @@
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });
 
             $("#addNewEditDialog").on("shown.bs.modal", function () {
+                $('#readonlyinputBusinessUnitID').text(lookupNameValue($('#readonlyinputBusinessUnitID').text()));
                 $("#uploadFiles").fileinput({
                     uploadUrl: fileUploadUrl,
                     uploadAsync: true,
@@ -507,12 +508,12 @@
                     minFileCount: 1,
                     maxFileCount: 12
                 });
-                
+
                 if (viewModel.dataHubIsConnected()) {
                     dataHub.queryBusinessUnits().done(function (data) {
                         $.each(data, function (key, val) {
                             var selected = false;
-                            if (key == 1) selected = true;
+                            if (key + 1 == viewModel.currentRecord().BusinessUnitID()) selected = true;
                             $('#buIDSelction').append(new Option(val.Name, val.ID, true, selected));
                         });
 

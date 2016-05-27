@@ -45,10 +45,8 @@ namespace MiPlan.Models
         [StringLength(80)]
         public string Title { get; set; }
 
-        [Required]
         public int ThemeID { get; set; }
 
-        [Required]
         public int BusinessUnitID { get; set; }
 
         public int ForeignKey1 { get; set; }
@@ -57,7 +55,6 @@ namespace MiPlan.Models
 
         public int ForeignKey3 { get; set; }
 
-        [Required]
         public bool IsDeleted { get; set; }
 
         public string Field1 { get; set; }

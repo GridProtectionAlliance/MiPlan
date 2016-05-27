@@ -217,6 +217,8 @@ namespace MiPlan
             record.UpdatedByID = record.CreatedByID;
             record.UpdatedOn = record.CreatedOn;
             record.IsCompleted = false;
+            record.ThemeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
+
             m_dataContext.Table<MitigationPlan>().AddNewRecord(record);
         }
 
@@ -224,7 +226,6 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
         public void UpdateMitigationPlan(MitigationPlan record)
         {
-            record.ThemeID = 13;
             record.UpdatedByID = GetCurrentUserID();
             record.UpdatedOn = DateTime.UtcNow;
             record.IsCompleted = false;
@@ -312,6 +313,8 @@ namespace MiPlan
             record.UpdatedByID = record.CreatedByID;
             record.UpdatedOn = record.CreatedOn;
             record.IsCompleted = false;
+            record.ThemeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
+
             m_dataContext.Table<MitigationPlanUnapproved>().AddNewRecord(record);
         }
 
@@ -319,7 +322,6 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.UpdateRecord)]
         public void UpdateMitigationPlanUnapproved(MitigationPlanUnapproved record)
         {
-            record.ThemeID = 13;
             record.UpdatedByID = GetCurrentUserID();
             record.UpdatedOn = DateTime.UtcNow;
             record.IsCompleted = false;
@@ -402,6 +404,8 @@ namespace MiPlan
             record.UpdatedByID = record.CreatedByID;
             record.UpdatedOn = record.CreatedOn;
             record.IsCompleted = false;
+            record.ThemeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
+
             m_dataContext.Table<MitigationPlanApproved>().AddNewRecord(record);
         }
 
@@ -409,7 +413,6 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.UpdateRecord)]
         public void UpdateMitigationPlanApproved(MitigationPlanApproved record)
         {
-            record.ThemeID = 13;
             record.UpdatedByID = GetCurrentUserID();
             record.UpdatedOn = DateTime.UtcNow;
             record.IsCompleted = false;
@@ -979,6 +982,16 @@ namespace MiPlan
             return new PlansActionCompletedView();
         }
 
+        [AuthorizeHubRole("Administrator, Owner")]
+        [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.UpdateRecord)]
+        public void UpdateMitigationPlan(PlansActionCompletedView record)
+        {
+            
+            record.UpdatedByID = GetCurrentUserID();
+            record.UpdatedOn = DateTime.UtcNow;
+            record.IsCompleted = false;
+            m_dataContext.Table<MitigationPlan>().UpdateRecord(record);
+        }
 
         #endregion
 
