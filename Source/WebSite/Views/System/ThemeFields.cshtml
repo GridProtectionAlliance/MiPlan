@@ -69,7 +69,7 @@
 
         @Html.Raw(Model.RenderViewModelConfiguration<ThemeFields>(ViewBag, "FieldNumber", parentID))
 
-        $(viewModel).on("derivingObservableRecord", function(event, observableRecord) {
+        $(viewModel).on("beforeSave", function(event, observableRecord) {
             // Initialize selected value list record
             observableRecord.ThemeID(@parentID);
         });

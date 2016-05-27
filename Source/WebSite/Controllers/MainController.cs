@@ -124,6 +124,9 @@ namespace MiPlan.Controllers
             ViewBag.ActionsInAlarm = actions;
             MitigationPlan[] plans = m_dataContext.Table<MitigationPlan>().QueryRecords("Title", restriction: new RecordRestriction("DATEDIFF(day, CreatedOn, {0}) < 1", today)).ToArray();
             ViewBag.PlansAddedToday = plans;
+            int groupID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM ValueListGroup WHERE Name = 'alarmLimits'") ?? 0;
+            ViewBag.alarmLimits = m_dataContext.Table<ValueList>().QueryRecords(restriction: new RecordRestriction("GroupID = {0}", groupID)).ToArray();
+
             return View();
         }
 
@@ -178,6 +181,9 @@ namespace MiPlan.Controllers
             ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
+            int groupID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM ValueListGroup WHERE Name = 'alarmLimits'") ?? 0;
+            ViewBag.alarmLimits = m_dataContext.Table<ValueList>().QueryRecords(restriction: new RecordRestriction("GroupID = {0}", groupID)).ToArray();
+
             return View();
         }
 
@@ -188,6 +194,9 @@ namespace MiPlan.Controllers
             ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
+            int groupID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM ValueListGroup WHERE Name = 'alarmLimits'") ?? 0;
+            ViewBag.alarmLimits = m_dataContext.Table<ValueList>().QueryRecords(restriction: new RecordRestriction("GroupID = {0}", groupID)).ToArray();
+
             return View();
         }
 
@@ -212,6 +221,9 @@ namespace MiPlan.Controllers
         public ActionResult ActionItem()
         {
             m_appModel.ConfigureView<ActionItem>(Url.RequestContext, "ActionItem", ViewBag);
+            int groupID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM ValueListGroup WHERE Name = 'alarmLimits'") ?? 0;
+            ViewBag.alarmLimits = m_dataContext.Table<ValueList>().QueryRecords(restriction: new RecordRestriction("GroupID = {0}", groupID)).ToArray();
+
             return View();
         }
 

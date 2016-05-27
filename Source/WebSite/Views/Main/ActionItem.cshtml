@@ -39,6 +39,8 @@
     ViewBag.planID = planID;
     string statusLightsImagePath = Model.GetPageSetting(ViewBag, "statusLightsImagePath", "~/Images/StatusLights/Small/");
     statusLightsImagePath = Url.Content(statusLightsImagePath).EnsureEnd('/');
+    int pastDue = ViewBag.alarmLimits[0].Value;
+    int due = ViewBag.alarmLimits[1].Value;
 
 
 
@@ -163,7 +165,7 @@
         @Html.Raw(Model.RenderValueListClientLookupFunction("priority"))
 
 
-        $(viewModel).on("derivingObservableRecord", function(event, observableRecord) {
+        $(viewModel).on("beforeSave", function(event, observableRecord) {
             // Initialize selected menu item record
             observableRecord.PlanID(@planID);
 
@@ -194,11 +196,11 @@
                 const daysUntilEnd = (record.ScheduledEndDate.toDate()).daysBetween(new Date());
 
                 switch (true) {
-                case (daysUntilEnd < 0):
+                case (daysUntilEnd < @pastDue):
                     image = "@pastDueImage";
                     title = "Past Due";
                     break;
-                case (daysUntilEnd < 7):
+                case (daysUntilEnd < @due):
                     image = "@dueImage";
                     title = "Due";
                     break;

@@ -117,7 +117,7 @@
             newRecord.AccountName = ko.observable("");
         });
 
-        $(viewModel).on("derivingJSRecord", function (event, observableRecord) {
+        $(viewModel).on("recordSaved", function (event, observableRecord) {
             // Remove virtual observable field before serialization for record updates
             delete observableRecord.AccountName;
         });
