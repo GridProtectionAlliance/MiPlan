@@ -35,7 +35,9 @@
 
     // Setup page control scripts
     pageControlScripts.Append(Scripts.Render("~/js.bundle/knockout"));
+    // TODO: Currently the bundler will fail to properly compress paged view model, check again after updates...
     pageControlScripts.Append($"<script src=\"{Url.Content("~/Scripts/pagedViewModel.js")}\"></script>");
+    pageControlScripts.Append(Scripts.Render("~/js.bundle/gsfwebprimeui"));
 
     pageControlScripts.Append(@"
     <script id=""validationMessageTemplate"" type=""text/html""><!--
@@ -85,6 +87,9 @@
         if (value.EndsWith("IES", StringComparison.Ordinal))
             return value.Substring(0, value.Length - 3) + "Y";
 
+        if (value.EndsWith("ces", StringComparison.OrdinalIgnoreCase))
+            return value.Substring(0, value.Length - 1);
+
         if (value.EndsWith("es", StringComparison.OrdinalIgnoreCase))
             return value.Substring(0, value.Length - 2);
 
@@ -129,56 +134,51 @@
         pageControlScripts.Append(RenderSortScript(fieldName, false));
     }
 }
-
-   <div class="well well-dynamic-content" id="contentWell" content-fill-height>
-        <div class="table-responsive" id="responsiveTableDiv">
-            <table class="table table-condensed table-hover" id="recordsTable">
-                <thead>
-                <tr>
-                    @foreach (string[] headerColumn in ViewBag.HeaderColumns)
-                    {
+<div class="well well-dynamic-content" id="contentWell" content-fill-height>
+    <div class="table-responsive" id="responsiveTableDiv">
+        <table class="table table-condensed table-hover" id="recordsTable">
+            <thead>
+                <tr>                
+                    @foreach (string[] headerColumn in ViewBag.HeaderColumns) {
                         @WriteFieldHeader(pageControlScripts, headerColumn[0], headerColumn[1], headerColumn[2])
                     }
                     <th class="text-center">
                         <button type="button" class="btn btn-link btn-xs" style="line-height: 1.1" id="clearSortOrder" data-bind="enable: dataHubIsConnected">Clear<br/>Sort</button>
                     </th>
                 </tr>
-                </thead>
-                <tbody data-bind="foreach: pageRecords">
+            </thead>
+            <tbody data-bind="foreach: pageRecords">
                 <tr style="visibility: hidden" id="recordRow"@Html.Raw(ViewBag.ShowDeleted ?? false ? $" data-bind=\"css: {{'danger': {ViewBag.IsDeletedField}}}\"" : "")>
                     @Html.Raw(ViewBag.BodyRows)
                 </tr>
-                </tbody>
-            </table>
-            <div id="loadingDataLabel">
-                Loading&nbsp;&nbsp;<span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
-            </div>
-        </div>
-        <div class="pull-right" id="pageControlsRow">
-            @if (!hideAddNewButton && (canAddNew || !hideUnauthorizedControls))
-            {
-                <button type="button" class="btn btn-sm btn-primary pull-right" id="addRecordButton" @Html.Raw(canAddNew ? "data-bind=\"enable: dataHubIsConnected\"" : "disabled")>
-                    <span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Add&nbsp;New
-                </button>
-                <br/>
-                <hr class="half-break"/>
-            }
-            <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-default" id="firstPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-backward"></span></button>
-                <button type="button" class="btn btn-default" id="previousPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-triangle-left"></span></button>
-            </div>
-            <input type="number" class="content input-sm" style="padding: 0 0 0 5px; width: 55px" id="selectedPage" data-bind="numeric, textInput: currentPage, enable: dataHubIsConnected" value="1">
-            &nbsp;of&nbsp;
-            <span data-bind="text: totalPages">1</span>
-            &nbsp;
-            <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-default" id="nextPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-triangle-right"></span></button>
-                <button type="button" class="btn btn-default" id="lastPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-forward"></span></button>
-            </div>
+            </tbody>
+        </table>
+        <div id="loadingDataLabel">
+            Loading&nbsp;&nbsp;<span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
         </div>
     </div>
-
-
+    <div class="pull-right" id="pageControlsRow">
+        @if (!hideAddNewButton && (canAddNew || !hideUnauthorizedControls)) {
+            <button type="button" class="btn btn-sm btn-primary pull-right" id="addRecordButton" @Html.Raw(canAddNew ? "data-bind=\"enable: dataHubIsConnected\"" : "disabled")>
+                <span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;Add&nbsp;New
+            </button>
+            <br />
+            <hr class="half-break" />
+        }
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-default" id="firstPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-backward"></span></button>
+            <button type="button" class="btn btn-default" id="previousPageButton" data-bind="css: {'disabled': onFirstPage()}, enable: dataHubIsConnected() && !onFirstPage()"><span class="glyphicon glyphicon-triangle-left"></span></button>
+        </div>
+        <input type="number" class="content input-sm" style="padding: 0 0 0 5px; width: 55px" id="selectedPage" data-bind="numeric, textInput: currentPage, enable: dataHubIsConnected" value="1">
+        &nbsp;of&nbsp;
+        <span data-bind="text: totalPages">1</span>
+        &nbsp;
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-default" id="nextPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-triangle-right"></span></button>
+            <button type="button" class="btn btn-default" id="lastPageButton" data-bind="css: {'disabled': onLastPage()}, enable: dataHubIsConnected() && !onLastPage()"><span class="glyphicon glyphicon-forward"></span></button>
+        </div>
+    </div>
+</div>
 <div id="addNewEditDialog" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -263,14 +263,6 @@
 
             $(""#addNewEditDialog"").modal({show: false, backdrop: ""static"", keyboard: false});
 
-            $(""#addNewEditDialog"").on(""shown.bs.modal"", function () {
-                $(""#addNewEditDialog .input-group.date"").datepicker({
-                    todayBtn: ""linked"",
-                    enableOnReadonly: false,
-                    autoclose: true
-                });
-            });
-
             $(window).on(""beforeunload"", function () {
                 if ($(""#addNewEditDialog"").hasClass(""in"") && viewModel.isDirty())
                     return ""There are unsaved changes to this record."";
@@ -343,6 +335,37 @@
 
         pageControlScripts.Append("\r\n        });");
     }
+
+    pageControlScripts.Append(@"
+
+        $(""#addNewEditDialog"").on(""shown.bs.modal"", function () {
+            $(""#addNewEditDialog .input-group.date"").datepicker({
+                todayBtn: ""linked"",
+                enableOnReadonly: false,
+                autoclose: true
+            });");
+
+    if (dataContext.ReadonlyHotLinkFields.Count > 0) {
+        foreach (Tuple<string, string, string, bool> readonlyHotLinkField in dataContext.ReadonlyHotLinkFields) {
+            pageControlScripts.AppendLine();
+
+            if (readonlyHotLinkField.Item4) {
+                pageControlScripts.AppendFormat("\r\n            $(\"#{0}\").after(\"<div id=\\\"{1}\\\" tabindex=\\\"0\\\" class=\\\"form-control readonly textarea\\\" data-bind=\\\"html: renderHotLinks(notNull({2}())), visible: viewModel.recordMode()===RecordMode.View\\\"></div>\");",
+                    readonlyHotLinkField.Item1, readonlyHotLinkField.Item2, readonlyHotLinkField.Item3);
+                pageControlScripts.AppendFormat("\r\n            $(\"#{0}\").height($(\"#{1}\").height());",
+                    readonlyHotLinkField.Item2, readonlyHotLinkField.Item1);
+            }
+            else {
+                pageControlScripts.AppendFormat("\r\n            $(\"#{0}\").after(\"<div id=\\\"{1}\\\" tabindex=\\\"0\\\" class=\\\"form-control readonly inputtext\\\" data-bind=\\\"html: renderHotLinks(notNull({2}())), visible: viewModel.recordMode()===RecordMode.View\\\"></div>\");",
+                    readonlyHotLinkField.Item1, readonlyHotLinkField.Item2, readonlyHotLinkField.Item3);
+            }
+
+            pageControlScripts.AppendFormat("\r\n            ko.applyBindings(viewModel.currentRecord, $(\"#{0}\")[0]);",
+                readonlyHotLinkField.Item2);
+        }
+    }
+
+    pageControlScripts.Append("\r\n        });");
 
     pageControlScripts.Append(@"
     </script>");

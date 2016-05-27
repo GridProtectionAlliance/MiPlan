@@ -55,6 +55,28 @@ a.custom-text:active {
     text-decoration: underline;
 }
 
+/* Define read-only style for disabled div areas */
+div.readonly {
+    background-color: #eee;
+    word-wrap: break-word;
+}
+
+div.readonly.inputtext {
+    overflow: hidden;
+}
+
+div.readonly.textarea {
+    overflow-x: hidden;
+    resize: both;
+}
+
+div.readonly:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
 @media(min-width: 768px) {
     #pageWrapper #footer {
         display: block;
@@ -347,4 +369,19 @@ hr.full-break {
   -ms-transform: scale(1, -1);
   -o-transform: scale(1, -1);
   transform: scale(1, -1);
+}
+
+.right-inner-addon {
+    position: relative;
+}
+
+.right-inner-addon input {
+    padding-right: 30px;
+}
+
+.right-inner-addon i {
+    position: absolute;
+    right: 0px;
+    padding: 10px 12px;
+    pointer-events: none;
 }

@@ -116,8 +116,9 @@
         new[] { "Title", "Plan Title", "text-left" },
         new[] { "BusinessUnitID", "Busness Unit", "text-left"},
         new[] { "Field1", "Title", "text-left"},
+        new[] { "CreatedOn", "Plan Date", "text-center"},
         new[] { null, "Actions", "text-center valign-middle" },
-        new[] { null, "Tracking", "text-center valign-middle" },
+        new[] { null, "Approval", "text-center valign-middle" },
         new[] { null, "Documents", "text-center valign-middle" }
 
     };
@@ -127,15 +128,33 @@
     ViewBag.AddNewEditTitle = "Mitigation Plan";
 
 }
+
+@helper PlanFilter()
+{
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='form-group'>
+                <label for='planfilter'>Plan Title Filter:</label>
+                <div class='right-inner-addon'>
+                    <i class='glyphicon glyphicon-search'></i>
+                    <input class='form-control' type='search' id='planfilter' placeholder='Search' />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
 @helper BodyRows()
 {
         <td width="5%" class="text-center valign-middle"><img src="~/Images/StatusLights/Small/greenlight.png" alt="OK" title="OK" data-bind="attr: {'update-attr': getStatusImage($($element), $data)}"></td>
         <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: Title, click: $parent.viewPageRecord"></button></td>
         <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupAbbreviationValue(BusinessUnitID)"></div></td>
-        <td width="50%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
+        <td width="40%" class="text-left valign-middle"><div nowrap data-bind="text: Field1"></div></td>
+        <td width="5%" class="text-left valign-middle"><div nowrap data-bind="text: CreatedOn.formatDate(DateFormat)"></div></td>
         <td width="5%" class="text-center valign-middle"><button type="button" id="newWindow" data-bind="click: openMenuItemEditor.bind($data), enable: $parent.dataHubIsConnected" class="btn btn-danger btn-sm">Actions&nbsp;&nbsp;<span class="badge" data-bind="text: getActionCount(ID, $($element)), attr: {id: 'actionCount' + ID}">0</span></button></td>
         <td width="5%" class="text-center valign-middle"><button type="button" data-bind="click: openStartTracking.bind($data), visible: getActionStatusKey($data, $($element))" class="btn btn-danger btn-sm">Start</button></td>
-        <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
+        <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected && $parent.canEdit()">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
         <td width="5%" class="text-center valign-middle" nowrap>
             <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
             <button type="button" class="btn btn-xs" data-bind="click: $parent.removePageRecord, enable: $parent.canDelete() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-remove"></span></button>
@@ -456,6 +475,22 @@
 
 
         $(function () {
+            
+            $("#pageHeader").append("@Html.Raw(PlanFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
+            
+            $('#planfilter').on('keyup', function (e) {
+                if ($('#planfilter').val().length == 0) {
+                    viewModel.filterText = '%';
+                    viewModel.filterPageRecords();
+                } else {
+                    viewModel.filterText = $('#planfilter').val();
+                    viewModel.filterPageRecords();
+
+                }
+
+            });
+
+
             $("#manageDocumentsDialog").modal({ show: false, backdrop: "static", keyboard: false });
 
             $("#editActionItemDialog").modal({ show: false, backdrop: "static", keyboard: false });

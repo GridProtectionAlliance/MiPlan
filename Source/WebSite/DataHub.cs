@@ -158,19 +158,33 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecordCount)]
         public int QueryMitigationPlanCount(bool showDeleted, bool isCompleted, string filterText)
         {
-            if (showDeleted)
-                return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = {0}", isCompleted));
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0}", isCompleted));
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsCompleted = {0} AND Title LIKE {1}", isCompleted, filterText));
+
+            return m_dataContext.Table<MitigationPlan>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0} AND Title LIKE {1}", isCompleted, filterText));
         }
 
         [RecordOperation(typeof(MitigationPlan), RecordOperation.QueryRecords)]
         public IEnumerable<MitigationPlan> QueryMitigationPlanes(bool showDeleted, bool isCompleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
-            if (showDeleted)
-                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = {0}", isCompleted));
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0}", isCompleted));
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = {0} AND Title LIKE {1}", isCompleted, filterText));
+
+            return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0} AND Title LIKE {1}", isCompleted, filterText));
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
@@ -239,19 +253,33 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.QueryRecordCount)]
         public int QueryMitigationPlanUnapprovedCount(bool showDeleted,  string filterText)
         {
-            if (showDeleted)
-                return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecordCount(new RecordRestriction("IsCompleted = 0 AND IsApproved = 0"));
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 0"));
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecordCount(new RecordRestriction("IsCompleted = 0 AND IsApproved = 0 AND Title LIKE {0}", filterText));
+
+            return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 0 AND Title LIKE {0}", filterText));
         }
 
         [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.QueryRecords)]
         public IEnumerable<MitigationPlanUnapproved> QueryMitigationPlanUnapprovedes(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
-            if (showDeleted)
-                return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = 0 AND IsApproved = 0"));
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 0"));
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = 0 AND IsApproved = 0 AND Title LIKE {0}", filterText));
+
+            return m_dataContext.Table<MitigationPlanUnapproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 0 AND Title LIKE {0}", filterText));
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
@@ -315,19 +343,33 @@ namespace MiPlan
         [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.QueryRecordCount)]
         public int QueryMitigationPlanApprovedCount(bool showDeleted, string filterText)
         {
-            if (showDeleted)
-                return m_dataContext.Table<MitigationPlanApproved>().QueryRecordCount(new RecordRestriction("IsCompleted = 0 AND IsApproved = 1"));
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return m_dataContext.Table<MitigationPlanApproved>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 1"));
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanApproved>().QueryRecordCount(new RecordRestriction("IsCompleted = 0 AND IsApproved = 1 AND Title LIKE {0}", filterText));
+
+            return m_dataContext.Table<MitigationPlanApproved>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 1 AND Title LIKE {0}", filterText));
         }
 
         [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.QueryRecords)]
         public IEnumerable<MitigationPlanApproved> QueryMitigationPlanApprovedes(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
-            if (showDeleted)
-                return m_dataContext.Table<MitigationPlanApproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = 0 AND IsApproved = 1"));
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return m_dataContext.Table<MitigationPlanApproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 1"));
+            if (showDeleted)
+                return m_dataContext.Table<MitigationPlanApproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsCompleted = 0 AND IsApproved = 1 AND Title LIKE {0}", filterText));
+
+            return m_dataContext.Table<MitigationPlanApproved>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = 0 AND IsApproved = 1 AND Title LIKE {0}", filterText));
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
@@ -456,20 +498,20 @@ namespace MiPlan
         #region [ NoticeLog Table Operations ]
 
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         [RecordOperation(typeof(NoticeLog), RecordOperation.QueryRecordCount)]
         public int QueryNoticeLogCount(string filterText)
         {
             return m_dataContext.Table<NoticeLog>().QueryRecordCount();
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         public IEnumerable<NoticeLog> QueryNoticeLogs()
         {
             return m_dataContext.Table<NoticeLog>().QueryRecords();
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         [RecordOperation(typeof(NoticeLog), RecordOperation.QueryRecords)]
         public IEnumerable<NoticeLog> QueryNoticeLogs(string sortField, bool ascending, int page, int pageSize, string filterText)
         {
@@ -483,14 +525,14 @@ namespace MiPlan
             m_dataContext.Table<NoticeLog>().DeleteRecord(id);
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         [RecordOperation(typeof(NoticeLog), RecordOperation.CreateNewRecord)]
         public NoticeLog NewNoticeLog()
         {
             return new NoticeLog();
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("*")]
         [RecordOperation(typeof(NoticeLog), RecordOperation.AddNewRecord)]
         public void AddNewNoticeLog(NoticeLog record)
         {
@@ -500,24 +542,98 @@ namespace MiPlan
 
         #endregion
 
+        #region [ NoticeLogView Table Operations ]
+
+
+        [AuthorizeHubRole("*")]
+        [RecordOperation(typeof(NoticeLogView), RecordOperation.QueryRecordCount)]
+        public int QueryNoticeLogViewCount(string filterText)
+        {
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
+            return m_dataContext.Table<NoticeLogView>().QueryRecordCount(new RecordRestriction("Title LIKE {0}", filterText));
+        }
+
+        [AuthorizeHubRole("*")]
+        public IEnumerable<NoticeLogView> QueryNoticeLogViews()
+        {
+            return m_dataContext.Table<NoticeLogView>().QueryRecords();
+        }
+
+        [AuthorizeHubRole("*")]
+        [RecordOperation(typeof(NoticeLogView), RecordOperation.QueryRecords)]
+        public IEnumerable<NoticeLogView> QueryNoticeLogViews(string sortField, bool ascending, int page, int pageSize, string filterText)
+        {
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
+            return m_dataContext.Table<NoticeLogView>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("Title LIKE {0}", filterText));
+        }
+
+        [AuthorizeHubRole("Administrator")]
+        [RecordOperation(typeof(NoticeLogView), RecordOperation.DeleteRecord)]
+        public void DeleteNoticeLogView(int id)
+        {
+            m_dataContext.Table<NoticeLogView>().DeleteRecord(id);
+        }
+
+        [AuthorizeHubRole("*")]
+        [RecordOperation(typeof(NoticeLogView), RecordOperation.CreateNewRecord)]
+        public NoticeLogView NewNoticeLogView()
+        {
+            return new NoticeLogView();
+        }
+
+        [AuthorizeHubRole("*")]
+        [RecordOperation(typeof(NoticeLogView), RecordOperation.AddNewRecord)]
+        public void AddNewNoticeLogView(NoticeLogView record)
+        {
+            record.CreatedOn = DateTime.UtcNow;
+            m_dataContext.Table<NoticeLogView>().AddNewRecord(record);
+        }
+
+        #endregion
+
+
         #region [ BusinessUnitGroup Table Operations ]
 
         [RecordOperation(typeof(BusinessUnit), RecordOperation.QueryRecordCount)]
         public int QueryBusinessUnitGroupCount(bool showDeleted, string filterText)
         {
-            if (showDeleted)
-                return BUContext.Table<BusinessUnit>().QueryRecordCount();
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return BUContext.Table<BusinessUnit>().QueryRecordCount(new RecordRestriction("IsDeleted = 0"));
+            if (showDeleted)
+                return BUContext.Table<BusinessUnit>().QueryRecordCount(new RecordRestriction("Name LIKE {0}", filterText));
+
+            return BUContext.Table<BusinessUnit>().QueryRecordCount(new RecordRestriction("IsDeleted = 0 AND Name LIKE {0}", filterText));
         }
 
         [RecordOperation(typeof(BusinessUnit), RecordOperation.QueryRecords)]
         public IEnumerable<BusinessUnit> QueryBusinessUnitGroups(bool showDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
-            if (showDeleted)
-                return BUContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize);
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
 
-            return BUContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0"));
+            if (showDeleted)
+                return BUContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("Name LIKE {0}", filterText));
+
+            return BUContext.Table<BusinessUnit>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND Name LIKE {0}", filterText));
         }
 
         public IEnumerable<BusinessUnit> QueryBusinessUnits()
@@ -525,7 +641,7 @@ namespace MiPlan
             return BUContext.Table<BusinessUnit>().QueryRecords(restriction: new RecordRestriction("IsDeleted = 0"));
         }
 
-        [AuthorizeHubRole("Administrator, Owner")]
+        [AuthorizeHubRole("Administrator")]
         [RecordOperation(typeof(BusinessUnit), RecordOperation.DeleteRecord)]
         public void DeleteBusinessUnitGroup(int id)
         {
@@ -833,13 +949,27 @@ namespace MiPlan
         [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.QueryRecordCount)]
         public int QueryPlansActionCompletedViewCount(bool isDeleted, string filterText)
         {
-            return m_dataContext.Table<PlansActionCompletedView>().QueryRecordCount();
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
+
+            return m_dataContext.Table<PlansActionCompletedView>().QueryRecordCount(new RecordRestriction("Title LIKE {0}", filterText));
         }
 
         [RecordOperation(typeof(PlansActionCompletedView), RecordOperation.QueryRecords)]
         public IEnumerable<PlansActionCompletedView> QueryPlansActionCompletedViews(bool isDeleted, string sortField, bool ascending, int page, int pageSize, string filterText)
         {
-            return m_dataContext.Table<PlansActionCompletedView>().QueryRecords(sortField, ascending, page, pageSize);
+            if (filterText == null) filterText = "%";
+            else
+            {
+                // Build your filter string here!
+                filterText += "%";
+            }
+
+            return m_dataContext.Table<PlansActionCompletedView>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("Title LIKE {0}", filterText));
         }
 
 

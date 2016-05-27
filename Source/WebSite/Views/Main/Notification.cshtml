@@ -28,32 +28,87 @@
     DataContext dataContext = Model.DataContext;
     ViewBag.HideAddNewButton = true;
 }
-<p>Will display the time history of notifications.  Who received what notification email.</p>
+@*<p>Will display the time history of notifications.  Who received what notification email.</p>*@
 @{
     ViewBag.HeaderColumns = new[]
 {
         //    { "Field", "Label", "Classes" }
-        new[] { "PatchID", "SPM Reference", "text-left" },
+        new[] { "PatchID", "Plan Title", "text-left" },
         new[] { "NoticeMethodkey", "Notice Method", "text-left"},
         new[] { "ToUsers", "Persons Notified", "text-left"},
-        new[] { "SentOn", "Date Sent", "text-center valign-middle" }
+        new[] { "SentOn", "Date Sent", "text-center" }
     };
 
     ViewBag.BodyRows = BodyRows().ToString();
+    ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
+    ViewBag.AddNewEditTitle = "Notification Details";
+
 
 }
+@helper PlanFilter()
+{
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='form-group'>
+                <label for='planfilter'>Plan Title Filter:</label>
+                <div class='right-inner-addon'>
+                    <i class='glyphicon glyphicon-search'></i>
+                    <input class='form-control' type='search' id='planfilter' placeholder='Search' />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
 @helper BodyRows()
 {
     <td width="15%" class="text-left valign-middle"><button type="button" class="btn btn-link" data-bind="text: lookupTitleValue(PatchID), click: $parent.viewPageRecord"></button></td>
     <td width="15%" class="text-left valign-middle"><div nowrap data-bind="text: lookupNoticemethodValue(NoticeMethodKey)"></div></td>
     <td width="60%" class="text-left valign-middle"><div nowrap data-bind="text: ToUsers"></div></td>
-    <td width="60%" class="text-left valign-middle"><div nowrap data-bind="text: SentOn.formatDate(DateFormat)"></div></td>
+    <td width="10%" class="text-center valign-middle"><div nowrap data-bind="text: SentOn.formatDate(DateFormat)"></div></td>
 }
+
+@helper AddNewEditDialog(DataContext dataContext)
+{
+    @Html.Raw(dataContext.AddInputField<NoticeLogView>("Title"))
+    @Html.Raw(Model.AddValueListSelectField<NoticeLogView>("NoticeMethodKey", "noticeMethod", fieldLabel: "Notice Method"))
+    @Html.Raw(Model.AddValueListSelectField<NoticeLogView>("NoticeLevelKey", "noticeLevel", fieldLabel: "Notice Level"))
+    @Html.Raw(dataContext.AddTextAreaField<NoticeLogView>("ToUsers"))
+    @Html.Raw(dataContext.AddTextAreaField<NoticeLogView>("XcUsers"))
+    @Html.Raw(dataContext.AddTextAreaField<NoticeLogView>("Text"))
+    @Html.Raw(dataContext.AddDateField<NoticeLogView>("SentOn"))
+
+
+
+
+}
+
+
 @Html.Partial("PagedViewModel")
 @section Scripts {
     <script>
-        @Html.Raw(Model.RenderViewModelConfiguration<NoticeLog>(ViewBag))
+        @Html.Raw(Model.RenderViewModelConfiguration<NoticeLogView>(ViewBag))
         @Html.Raw(Model.RenderAbstract<MitigationPlan>("Title"))
         @Html.Raw(Model.RenderValueListClientLookupFunction("noticeMethod"))
+        
+        $(function () {
+            
+            $("#pageHeader").append("@Html.Raw(PlanFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
+            
+            $('#planfilter').on('keyup', function (e) {
+                if ($('#planfilter').val().length == 0) {
+                    viewModel.filterText = '%';
+                    viewModel.filterPageRecords();
+                } else {
+                    viewModel.filterText = $('#planfilter').val();
+                    viewModel.filterPageRecords();
+
+                }
+
+            });
+
+        });
+
     </script>
 }

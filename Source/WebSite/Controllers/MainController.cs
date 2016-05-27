@@ -127,18 +127,6 @@ namespace MiPlan.Controllers
             return View();
         }
 
-        public ActionResult Patches()
-        {
-            m_appModel.ConfigureView<Patch>(Url.RequestContext, "Patches", ViewBag);
-            return View();
-        }
-
-        public ActionResult DiscoverPatches()
-        {
-            m_appModel.ConfigureView<LatestVendorDiscoveryResult>(Url.RequestContext, "Check", ViewBag);
-            return View();
-        }
-
         public ActionResult Help()
         {
             m_appModel.ConfigureView(Url.RequestContext, "Help", ViewBag);
@@ -173,20 +161,12 @@ namespace MiPlan.Controllers
             return View();
         }
 
-        public ActionResult Install()
-        {
-            m_appModel.ConfigureView(Url.RequestContext, "Install", ViewBag);
-            return View();
-        }
-
-        public ActionResult Assess()
-        {
-            m_appModel.ConfigureView(Url.RequestContext, "Assess", ViewBag);
-            return View();
-        }
-
         public ActionResult History()
         {
+            int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ViewBag.ThemeFields = fields;
+            ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "History", ViewBag);
             return View();
         }
@@ -214,16 +194,18 @@ namespace MiPlan.Controllers
 
         public ActionResult Notification()
         {
-            m_appModel.ConfigureView<NoticeLog>(Url.RequestContext, "Notification", ViewBag);
+            m_appModel.ConfigureView<NoticeLogView>(Url.RequestContext, "Notification", ViewBag);
             return View();
         }
 
 
         public ActionResult Done()
         {
+            int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ViewBag.ThemeFields = fields;
+            ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             m_appModel.ConfigureView<PlansActionCompletedView>(Url.RequestContext, "Done", ViewBag);
-            //ActionItem[] actions = m_dataContext.Table<ActionItem>().QueryRecords().ToArray();
-            //ViewBag.ActionItems = actions;
             return View();
         }
 

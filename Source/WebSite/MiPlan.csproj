@@ -48,20 +48,20 @@
       <HintPath>..\packages\ExpressionEvaluator.2.0.3.0\lib\net40\ExpressionEvaluator.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Core, Version=2.1.256.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Core.2.1.256-beta\lib\net46\GSF.Core.dll</HintPath>
+    <Reference Include="GSF.Core, Version=2.1.257.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Core.2.1.257-beta\lib\net46\GSF.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Security, Version=2.1.256.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Security.2.1.256-beta\lib\net46\GSF.Security.dll</HintPath>
+    <Reference Include="GSF.Security, Version=2.1.257.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Security.2.1.257-beta\lib\net46\GSF.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.ServiceModel, Version=2.1.256.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.ServiceModel.2.1.256-beta\lib\net46\GSF.ServiceModel.dll</HintPath>
+    <Reference Include="GSF.ServiceModel, Version=2.1.257.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.ServiceModel.2.1.257-beta\lib\net46\GSF.ServiceModel.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="GSF.Web, Version=2.1.256.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GSF.Web.2.1.256-beta\lib\net46\GSF.Web.dll</HintPath>
+    <Reference Include="GSF.Web, Version=2.1.257.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GSF.Web.2.1.257-beta\lib\net46\GSF.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -225,6 +225,7 @@
     <Compile Include="Models\MitigationPlanDocument.cs" />
     <Compile Include="Models\MitigationPlanUnapproved.cs" />
     <Compile Include="Models\NoticeLog.cs" />
+    <Compile Include="Models\NoticeLogView.cs" />
     <Compile Include="Models\NoticeUserLink.cs" />
     <Compile Include="Models\Page.cs" />
     <Compile Include="Models\Menu.cs" />
@@ -264,8 +265,34 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\fileinput.css" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\images\loading-sm.gif" />
+    <Content Include="Content\images\loading.gif" />
+    <Content Include="Content\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\images\ui-icons_333333_256x240.png" />
+    <Content Include="Content\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\jquery-ui.css" />
+    <Content Include="Content\jquery-ui.min.css" />
+    <Content Include="Content\jquery-ui.structure.css" />
+    <Content Include="Content\jquery-ui.structure.min.css" />
+    <Content Include="Content\jquery-ui.theme.css" />
+    <Content Include="Content\jquery-ui.theme.min.css" />
     <Content Include="Content\Popup.css" />
     <Content Include="Content\bootstrap-sidebar.css" />
+    <Content Include="Content\primeui-theme.css" />
+    <Content Include="Content\primeui.css" />
+    <Content Include="Content\primeui.min.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -366,11 +393,18 @@
     <Content Include="Scripts\fileinput.js" />
     <Content Include="Scripts\fileinput.min.js" />
     <Content Include="Scripts\gsf.web.client.js" />
+    <Content Include="Scripts\gsf.web.primeui.js" />
     <Content Include="Scripts\ie10-viewport-bug-workaround.js" />
     <Content Include="Scripts\jquery-2.2.0.js" />
     <Content Include="Scripts\jquery-2.2.0.min.js" />
     <Content Include="Scripts\jquery-2.2.0.min.map" />
+    <Content Include="Scripts\jquery-2.2.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery-2.2.1.js" />
+    <Content Include="Scripts\jquery-2.2.1.min.js" />
+    <None Include="Scripts\jquery-2.2.2.intellisense.js" />
+    <Content Include="Scripts\jquery-ui.js" />
+    <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -388,7 +422,11 @@
     <Content Include="Scripts\ko-reactor.min.js" />
     <Content Include="Scripts\ko.observableDictionary.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\mustache.min.js" />
     <Content Include="Scripts\pagedViewModel.js" />
+    <Content Include="Scripts\plugins-all.js" />
+    <Content Include="Scripts\primeui.js" />
+    <Content Include="Scripts\primeui.min.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />

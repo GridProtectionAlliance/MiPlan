@@ -123,7 +123,9 @@
     <div class="col-md-12">
         @Html.Raw(dataContext.AddSelectField<ActionItem, ActionItem>("ParentID", "ID", "Title", restriction: new RecordRestriction("PlanID = {0}", ViewBag.planID)))
         @Html.Raw(Model.AddValueListSelectField<ActionItem>("PriorityKey", "priority"))
-        @Html.Raw(Model.AddValueListSelectField<ActionItem>("ActionTypeKey", "actionStatus"))
+        <div data-bind="visible:  $parent.recordMode() != RecordMode.AddNew">
+            @Html.Raw(Model.AddValueListSelectField<ActionItem>("ActionTypeKey", "actionStatus"))
+        </div>
         @Html.Raw(dataContext.AddInputField<ActionItem>("Title"))
         @Html.Raw(dataContext.AddTextAreaField<ActionItem>("Details"))
         @Html.Raw(dataContext.AddDateField<ActionItem>("ScheduledEndDate"))

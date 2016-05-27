@@ -22,6 +22,7 @@
 //*****************************************************************************************************@
 @using GSF.Security.Model
 @using GSF.Web.Model
+@using GSF
 @using MiPlan.Models
 @model AppModel
 @{
@@ -38,6 +39,24 @@
     ViewBag.BodyRows = BodyRows().ToString();
     ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
 }
+
+@helper BUFilter()
+{
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class='form-group'>
+                <label for='bufilter'>Business Unit Name Filter:</label>
+                <div class='right-inner-addon'>
+                    <i class='glyphicon glyphicon-search'></i>
+                    <input class='form-control' type='search' id='bufilter' placeholder='Search' />
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
 @helper BodyRows()
 {
     <td width="25%" class="text-center valign-middle" nowrap><button type="button" class="btn btn-link" data-bind="text: Name, click: $parent.viewPageRecord"></button></td>
@@ -101,6 +120,23 @@
         $(viewModel).on("derivingJSRecord", function (event, observableRecord) {
             // Remove virtual observable field before serialization for record updates
             delete observableRecord.AccountName;
+        });
+        
+        $(function () {
+            $("#pageHeader").append("@Html.Raw(BUFilter().ToString().RemoveDuplicateWhiteSpace().Replace("\r\n", ""))");
+            $('#bufilter').on('keyup', function (e) {
+                if ($('#bufilter').val().length == 0) {
+                    viewModel.filterText = '%';
+                    viewModel.filterPageRecords();
+                } else {
+                    viewModel.filterText = $('#bufilter').val();
+                    viewModel.filterPageRecords();
+
+                }
+
+            });
+
+
         });
     </script>
 }
