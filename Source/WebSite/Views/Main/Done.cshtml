@@ -89,13 +89,19 @@
         </div>
     </div>
         <div data-bind="visible: $parent.recordMode()==RecordMode.View ">
-            @Html.Raw(dataContext.AddInputField<PlansActionCompletedView>("BusinessUnitID"))
+            @Html.Raw(dataContext.AddInputField<PlansActionCompletedView>("BusinessUnitID", fieldLabel: "Business Unit"))
         </div>
 
 for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
 {
-
-        @Html.Raw(dataContext.AddTextAreaField<PlansActionCompletedView>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+    if (ViewBag.ThemeFields[i].Description.Contains("Date"))
+    {
+            @Html.Raw(dataContext.AddDateField<MitigationPlan>("Field" + (i + 1).ToString(), fieldLabel: ViewBag.ThemeFields[i].FieldName))
+    }
+    else
+    {
+            @Html.Raw(dataContext.AddTextAreaField<MitigationPlan>("Field" + (i + 1).ToString(), 2, ViewBag.ThemeFields[i].FieldName))
+    }
 }
     @Html.Raw(dataContext.AddTextAreaField<PlansActionCompletedView>("Description"))
     @Html.Raw(dataContext.AddTextAreaField<PlansActionCompletedView>("StatusNotes"))

@@ -74,8 +74,8 @@
     ViewBag.BodyRows = BodyRows().ToString();
     ViewBag.AddNewEditDialog = AddNewEditDialog(dataContext).ToString();
     ViewBag.HideAddNewButton = hideButton;
-    ViewBag.CanEdit = !hideButton;
-    ViewBag.CanDelete = !hideButton;
+    //ViewBag.CanEdit = !hideButton;
+    //ViewBag.CanDelete = !hideButton;
 
 }
 
@@ -114,7 +114,7 @@
     <td width="20%" class="text-left valign-middle" data-bind="text: lookupActionstatusValue(ActionTypeKey)"></td>
     @*<td width="20%" class="text-left valign-middle"><button type="button" data-bind="text: lookupActionstatusValue(ActionTypeKey), click: updateStatus" class="btn btn-danger btn-sm">Add</button></td>*@
     <td width="40%" class="text-left valign-middle" data-bind="text: ScheduledEndDate.formatDate(DateFormat)"></td>
-    <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
+    <td width="5%" class="text-center valign-middle"><button type="button" class="btn btn-default btn-sm" data-bind="click: openManageDocumentsDialog.bind($data), enable: $parent.dataHubIsConnected && $parent.canEdit() ">Docs&nbsp;&nbsp;<span class="badge" data-bind="text: getDocumentCount(ID, $($element)), attr: {id: 'documentCount' + ID}">0</span></button></td>
     <td width="5%" class="text-center valign-middle" nowrap>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.editPageRecord, enable: $parent.canEdit() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-pencil"></span></button>
         <button type="button" class="btn btn-xs" data-bind="click: $parent.removePageRecord, enable: $parent.canDelete() && $parent.dataHubIsConnected()"><span class="glyphicon glyphicon-remove"></span></button>

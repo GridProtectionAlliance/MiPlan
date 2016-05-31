@@ -187,7 +187,7 @@ namespace MiPlan
             return m_dataContext.Table<MitigationPlan>().QueryRecords(sortField, ascending, page, pageSize, new RecordRestriction("IsDeleted = 0 AND IsCompleted = {0} AND Title LIKE {1}", isCompleted, filterText));
         }
 
-        [AuthorizeHubRole("Administrator, Owner")]
+        [AuthorizeHubRole("Administrator, Owner, Editor")]
         public int GetLastMitigationPlanID()
         {
             return m_dataContext.Connection.ExecuteScalar<int?>("SELECT IDENT_CURRENT('MitigationPlan')") ?? 0;
@@ -467,14 +467,14 @@ namespace MiPlan
             m_dataContext.Table<ActionItem>().DeleteRecord(id);
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("Administrator, Owner, Editor")]
         [RecordOperation(typeof(ActionItem), RecordOperation.CreateNewRecord)]
         public ActionItem NewActionItem()
         {
             return new ActionItem();
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("Administrator, Owner, Editor")]
         [RecordOperation(typeof(ActionItem), RecordOperation.AddNewRecord)]
         public void AddNewActionItem(ActionItem record)
         {
@@ -486,7 +486,7 @@ namespace MiPlan
             m_dataContext.Table<ActionItem>().AddNewRecord(record);
         }
 
-        [AuthorizeHubRole("Administrator")]
+        [AuthorizeHubRole("Administrator, Owner")]
         [RecordOperation(typeof(ActionItem), RecordOperation.UpdateRecord)]
         public void UpdateActionItem(ActionItem record)
         {
