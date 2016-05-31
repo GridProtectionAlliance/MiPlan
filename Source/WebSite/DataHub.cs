@@ -233,7 +233,6 @@ namespace MiPlan
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(MitigationPlan), RecordOperation.UpdateRecord)]
         public void CompleteMitigationPlan(MitigationPlan record)
         {
             record.UpdatedByID = GetCurrentUserID();
@@ -329,7 +328,6 @@ namespace MiPlan
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(MitigationPlanUnapproved), RecordOperation.UpdateRecord)]
         public void CompleteMitigationPlanUnapproved(MitigationPlanUnapproved record)
         {
             record.UpdatedByID = GetCurrentUserID();
@@ -420,7 +418,6 @@ namespace MiPlan
         }
 
         [AuthorizeHubRole("Administrator, Owner")]
-        [RecordOperation(typeof(MitigationPlanApproved), RecordOperation.UpdateRecord)]
         public void CompleteMitigationPlanApproved(MitigationPlanApproved record)
         {
             record.UpdatedByID = GetCurrentUserID();
