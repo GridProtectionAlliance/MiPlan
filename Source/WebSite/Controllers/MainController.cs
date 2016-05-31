@@ -167,7 +167,7 @@ namespace MiPlan.Controllers
         public ActionResult History()
         {
             int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
-            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldNumber", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "History", ViewBag);
@@ -178,7 +178,7 @@ namespace MiPlan.Controllers
         {
             int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
             m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "MitigationPlan", ViewBag);
-            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldNumber", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             int groupID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM ValueListGroup WHERE Name = 'alarmLimits'") ?? 0;
@@ -191,7 +191,7 @@ namespace MiPlan.Controllers
         {
             int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
             m_appModel.ConfigureView<MitigationPlan>(Url.RequestContext, "ActivePlans", ViewBag);
-            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldNumber", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             int groupID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM ValueListGroup WHERE Name = 'alarmLimits'") ?? 0;
@@ -211,7 +211,7 @@ namespace MiPlan.Controllers
         public ActionResult Done()
         {
             int themeID = m_dataContext.Connection.ExecuteScalar<int?>("SELECT ID FROM Theme WHERE IsDefault = 1") ?? 0;
-            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldName", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
+            ThemeFields[] fields = m_dataContext.Table<ThemeFields>().QueryRecords("FieldNumber", new RecordRestriction("ThemeID = {0}", themeID)).ToArray();
             ViewBag.ThemeFields = fields;
             ViewBag.ThemeFieldCount = m_dataContext.Table<ThemeFields>().QueryRecordCount(new RecordRestriction("ThemeID = {0}", themeID));
             m_appModel.ConfigureView<PlansActionCompletedView>(Url.RequestContext, "Done", ViewBag);
