@@ -197,7 +197,7 @@ namespace MiPlan.Models
 
             RecordRestriction restriction = new RecordRestriction("GroupID = {0} AND Enabled <> 0 AND Hidden = 0", key);
 
-            return DataContext.AddSelectField<T, ValueList>(fieldName, optionValueFieldName, optionLabelFieldName, optionSortFieldName, fieldLabel, fieldID, groupDataBinding, labelDataBinding, customDataBinding, dependencyFieldName, optionDataBinding, toolTip, initialFocus, restriction);
+            return DataContext.AddSelectField<T, ValueList>(fieldName, optionValueFieldName, optionLabelFieldName, optionSortFieldName, fieldLabel, fieldID, groupDataBinding, labelDataBinding, customDataBinding, dependencyFieldName, optionDataBinding, toolTip, initialFocus: initialFocus, restriction: restriction);
         }
 
         /// <summary>
