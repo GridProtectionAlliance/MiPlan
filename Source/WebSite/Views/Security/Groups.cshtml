@@ -126,16 +126,15 @@
                         <div class="center-block">
                             <div id="loadingRoles">Loading role assignments&nbsp;&nbsp;<span class="glyphicon glyphicon-refresh glyphicon-spin"></span><hr class="full-break" /></div>
                             <table class="table-condensed table-center">
-                                @foreach (ApplicationRole role in dataContext.Table<ApplicationRole>().QueryRecords("Name", new RecordRestriction("NodeID={0}", SecurityHub.DefaultNodeID)))
-                                {
-                                    <tr>
-                                        <td class="text-left valign-middle">
-                                            <div class="checkbox" style="margin: 0">
-                                                <label for="@role.ID"><input type="checkbox" id="@role.ID"> @role.Description (@role.Name)</label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
+                            @foreach (ApplicationRole role in dataContext.Table<ApplicationRole>().QueryRecords("Name", new RecordRestriction("NodeID={0}", SecurityHub.DefaultNodeID))) {
+                                <tr>
+                                    <td class="text-left valign-middle">
+                                        <div class="checkbox" style="margin: 0">
+                                            <label for="@role.ID"><input type="checkbox" id="@role.ID"> @role.Description (@role.Name)</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                             </table>
                             <br />
                             <div class="text-center">
@@ -294,7 +293,7 @@
             // Load human readable account name into Name field
             if (observableRecord.AccountName)
                 observableRecord.Name(observableRecord.AccountName());
-
+                
             // Create a virtual UseDBAuthentication field
             observableRecord.UseDBAuthentication = ko.observable(!useADAuthentication(notNull(observableRecord.Name())));
         });

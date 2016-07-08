@@ -321,31 +321,6 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
                 });
             }
 
-            //console.log(record);
-            //    var email = 'bernest@gridprotectionalliance.org';
-            //    var subject = 'Plan pending Approval for ' + record.Title;
-            //    var body_message = "NOTIFICATION: %0A%0A" +
-            //        "The following  mitigation plan is pending approval...%0A%0A" +
-            //        "Plan: " + record.Title + "%0A" +
-            //        "Business Unit: " + lookupNameValue(record.BusinessUnitID) + "%0A" +
-            //        "Description: " + record.Description + "%0A%0A" +
-            //        "Actions: %0A";
-
-
-            //    if (viewModel.dataHubIsConnected()) {
-            //        dataHub.queryActionItems(record.ID).done(function(data) {
-            //            data.forEach(function(i) {
-            //                //console.log(i);
-            //                body_message += " - Title: " + i.Title + "  Details: " + i.Details + "%0A";
-            //            });
-            //            var mailto_link = 'mailto:' + email + '?subject=' + subject + '&body=' + body_message;
-            //            window.open(mailto_link, 'emailWindow');
-            //            //if (win && win.open && !win.closed) win.close();
-            //        });
-
-            //        var noticeRecord = { PatchID: record.ID, NoticeMethodKey: 1, ToUsers: email, Text: body_message, SentOn: (new Date()) }
-            //        dataHub.addNewNoticeLog(noticeRecord);
-            //    }
         }
 
         function getActionStatusKey(record, element) {
@@ -414,7 +389,7 @@ for (int i = 0; i < ViewBag.ThemeFieldCount; ++i)
         });
 
         $(viewModel).on("recordSaved", function (event, record, newRecord) {
-            console.log(record);
+            //console.log(record);
             if (newRecord && selectedFiles.length > 0 && viewModel.dataHubIsConnected()) {
                 dataHub.getLastMitigationPlanID().done(function (planID) {
                     $("#uploadFiles").fileinput({

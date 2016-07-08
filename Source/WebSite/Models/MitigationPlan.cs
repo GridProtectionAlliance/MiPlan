@@ -33,7 +33,7 @@ namespace MiPlan.Models
     /// </summary>
     
     [TableName("MitigationPlan")]
-    [PrimaryLabel("Summary")]
+    [PrimaryLabel("Title")]
     [IsDeletedFlag("IsDeleted")]
     public class MitigationPlan
     {
