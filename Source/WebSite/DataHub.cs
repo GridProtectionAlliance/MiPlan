@@ -34,6 +34,7 @@ using GSF.Identity;
 using GSF.Reflection;
 using GSF.Security;
 using GSF.Security.Model;
+using GSF.Web.Hubs;
 using GSF.Web.Model;
 using GSF.Web.Security;
 using Microsoft.AspNet.SignalR;
